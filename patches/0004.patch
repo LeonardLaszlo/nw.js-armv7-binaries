@@ -1,0 +1,13 @@
+diff --git a/ffmpeg.gyp b/ffmpeg.gyp
+index dfda4b8..4a71889 100755
+--- a/ffmpeg.gyp
++++ b/ffmpeg.gyp
+@@ -80,7 +80,7 @@
+       ['chromeos == 1', {
+         'ffmpeg_branding%': '<(branding)OS',
+       }, {  # otherwise, assume Chrome/Chromium.
+-        'ffmpeg_branding%': '<(branding)',
++        'ffmpeg_branding%': '<(Chrome)',
+       }],
+     ],
+ 
