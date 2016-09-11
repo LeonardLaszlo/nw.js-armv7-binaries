@@ -104,7 +104,7 @@ gclient sync --with_branch_heads --nohooks
 This usually downloads 20G+ from GitHub and Google's Git repos. Make sure you have a good network provider and be patient.
 When finished, you will see a `src` folder in the same folder as `.gclient`.
 
-**Step 4.** The `install-build-deps` script should be used to install all the compiler and library dependencies directly from Ubuntu:
+**Step 4.** The `install-build-deps` script should be used to install all the compiler and library dependencies directly from Ubuntu repositories:
 ```bash
 cd src
 ./build/install-build-deps.sh --arm
@@ -145,12 +145,14 @@ export GYP_GENERATOR_FLAGS=output_dir=out_arm
 gclient runhooks
 ```
 
-**Step 7.** To enable proprietary codecs apply the following patch:
+**Step 7.** To enable proprietary codecs apply the following patch and run again the hooks:
 ```bash
 wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0004.patch -P $HOME/nwjs/
 cd src/third_party/ffmpeg/
 git apply --check $HOME/nwjs/0004.patch
 git apply $HOME/nwjs/0004.patch
+cd $HOME/nwjs
+gclient runhooks
 cd $HOME/nwjs/src
 ```
 
