@@ -26,5 +26,5 @@ Thanks @gripped, @jtg-gg!
 [nwjs-v0.12.2-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.2-linux-ARMv7.tar.gz/nwjs-v0.12.2-linux-arm.tar.gz
 [nwjs-sdk-v0.14.6-linux-armv7.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.6-linux-armv7/nwjs-sdk-v0.14.6-linux-armv7.tar.gz
 [nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.6-linux-armv7/nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz
-[nwjs-sdk-v0.14.6-linux-armv7-chrome-branding.tar.gz]:
-[nwjs-sdk-symbol-v0.14.6-linux-armv7-chrome-branding.tar.gz]:
+[nwjs-sdk-v0.14.6-linux-armv7-chrome-branding.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.6-linux-armv7-chrome-branding/nwjs-sdk-v0.14.6-linux-armv7-chrome-branding.tar.gz
+[nwjs-sdk-symbol-v0.14.6-linux-armv7-chrome-branding.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.6-linux-armv7-chrome-branding/nwjs-sdk-symbol-v0.14.6-linux-armv7-chrome-branding.tar.gz
