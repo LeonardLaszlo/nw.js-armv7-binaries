@@ -6,7 +6,7 @@ Chrome branding (enable proprietary codecs)
 On versions v0.14.6 and v0.15.1 shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
 
 ### Release log
-  - publish [nwjs-sdk-v0.14.6-linux-armv7.tar.gz] [nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz]
+  - publish [nwjs-sdk-v0.14.6-linux-armv7.tar.gz] and [nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz]
   - publish [nwjs-v0.12.2-linux-arm.tar.gz]
   - publish [nwjs-v0.12.0-linux-arm.tar.gz]
 
@@ -23,5 +23,5 @@ Thanks @gripped, @jtg-gg!
 
 [nwjs-v0.12.0-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.0-linux-ARMv7/nwjs-v0.12.0-linux-arm.tar.gz
 [nwjs-v0.12.2-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.2-linux-ARMv7.tar.gz/nwjs-v0.12.2-linux-arm.tar.gz
-[nwjs-sdk-v0.14.6-linux-armv7.tar.gz]:
-[nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz]:
+[nwjs-sdk-v0.14.6-linux-armv7.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.6-linux-armv7/nwjs-sdk-v0.14.6-linux-armv7.tar.gz
+[nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.6-linux-armv7/nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz
