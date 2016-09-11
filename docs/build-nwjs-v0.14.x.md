@@ -135,6 +135,7 @@ git apply --check $HOME/nwjs/0003.patch
 # apply
 git am $HOME/nwjs/0002.patch
 git am $HOME/nwjs/0003.patch
+cd $HOME/nwjs
 ```
 
 **Step 6.** Setup environment variables and run hooks:
