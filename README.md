@@ -17,4 +17,4 @@ On versions v0.14.6 and v0.15.1 shared object files located in 'lib' directory n
 
 Thanks @gripped, @jtg-gg!
 
-[nwjs-v0.12.0-linux-arm.tar.gz]: 
+[nwjs-v0.12.0-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.0-linux-ARMv7/nwjs-v0.12.0-linux-arm.tar.gz
