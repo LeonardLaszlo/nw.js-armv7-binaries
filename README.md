@@ -12,4 +12,9 @@ Chrome branding (enable proprietary codecs)
 
 On versions v0.14.6 and v0.15.1 shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
 
+### Release log
+  - publish [nwjs-v0.12.0-linux-arm.tar.gz]
+
 Thanks @gripped, @jtg-gg!
+
+[nwjs-v0.12.0-linux-arm.tar.gz]: 
