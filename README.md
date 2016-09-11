@@ -1,6 +1,16 @@
-# nw.js armv7 binaries
+# NW.js ARMv7 binaries
 
-On versions v0.14.6 and v0.15.1 shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
+On versions v0.14.x and v0.15.x shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
+
+If you don't want NW.js to store shared objects there, as an alternative, you can add the library where you store the shared objects to LD_LIBRARY_PATH environment variable, as shown below:
+`export LD_LIBRARY_PATH=/path/to/nwjs/nwjs-v0.15.1-linux-arm/lib:$LD_LIBRARY_PATH`
+
+Now if you run NW as shown below, it should work with no problems:
+`./nw --use-gl=egl --ignore-gpu-blacklist --disable-accelerated-2d-canvas --num-raster-threads=2`
+
+If you don't want to export the environment variable everytime you reboot you device you can add the export line to the end of `.bashrc` file.
+
+You can find a step-by-step guide how to build v0.14.x in the file [docs/build-nwjs-v0.14.x.md].
 
 ### Release log
   - publish [nwjs-sdk-v0.14.7-linux-arm.tar.gz] -- (Chrome branding)
@@ -26,6 +36,8 @@ Chrome branding (enable proprietary codecs)
 - http://docs.nwjs.io/en/latest/For%20Developers/Enable%20Proprietary%20Codecs
 
 Thanks @gripped, @jtg-gg!
+
+[docs/build-nwjs-v0.14.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.14.x.md
 
 [nwjs-v0.12.0-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.0-linux-ARMv7/nwjs-v0.12.0-linux-arm.tar.gz
 [nwjs-v0.12.2-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.2-linux-ARMv7.tar.gz/nwjs-v0.12.2-linux-arm.tar.gz
