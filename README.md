@@ -3,6 +3,7 @@
 On versions v0.14.6 and v0.15.1 shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
 
 ### Release log
+  - publish [nwjs-sdk-v0.14.7-linux-arm.tar.gz]
   - publish [nwjs-v0.15.1-linux-armv7-chrome-branding.tar.gz] and [nwjs-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz]
   - publish [nwjs-v0.15.1-linux-armv7.tar.gz] and [nwjs-symbol-v0.15.1-linux-armv7.tar.gz]
   - publish [nwjs-sdk-v0.15.1-linux-armv7-chrome-branding.tar.gz] and [nwjs-sdk-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz]
@@ -40,3 +41,4 @@ Thanks @gripped, @jtg-gg!
 [nwjs-symbol-v0.15.1-linux-armv7.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.15.1-linux-armv7/nwjs-symbol-v0.15.1-linux-armv7.tar.gz
 [nwjs-v0.15.1-linux-armv7-chrome-branding.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.15.1-linux-armv7-chrome-branding/nwjs-v0.15.1-linux-armv7-chrome-branding.tar.gz
 [nwjs-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.15.1-linux-armv7-chrome-branding/nwjs-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz
+[nwjs-sdk-v0.14.7-linux-arm.tar.gz]:
