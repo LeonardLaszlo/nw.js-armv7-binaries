@@ -15,16 +15,16 @@ You can find some step-by-step guides to build NW.js:
   - v0.14.x in file [docs/build-nwjs-v0.14.x.md].
 
 ### Release log
-  - publish [nwjs-sdk-v0.15.5-linux-arm.tar.gz] -- (Chrome branding)
-  - publish [nwjs-sdk-v0.14.7-linux-arm.tar.gz] -- (Chrome branding)
-  - publish [nwjs-v0.15.1-linux-armv7-chrome-branding.tar.gz] and [nwjs-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz]
-  - publish [nwjs-v0.15.1-linux-armv7.tar.gz] and [nwjs-symbol-v0.15.1-linux-armv7.tar.gz]
-  - publish [nwjs-sdk-v0.15.1-linux-armv7-chrome-branding.tar.gz] and [nwjs-sdk-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz]
-  - publish [nwjs-sdk-v0.15.1-linux-armv7.tar.gz] and [nwjs-sdk-symbol-v0.15.1-linux-armv7.tar.gz]
-  - publish [nwjs-sdk-v0.14.6-linux-armv7-chrome-branding.tar.gz] and [nwjs-sdk-symbol-v0.14.6-linux-armv7-chrome-branding.tar.gz]
-  - publish [nwjs-sdk-v0.14.6-linux-armv7.tar.gz] and [nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz]
-  - publish [nwjs-v0.12.2-linux-arm.tar.gz]
-  - publish [nwjs-v0.12.0-linux-arm.tar.gz]
+  - [nwjs-sdk-v0.15.5-linux-arm.tar.gz] -- (Chrome branding)
+  - [nwjs-sdk-v0.14.7-linux-arm.tar.gz] -- (Chrome branding)
+  - [nwjs-v0.15.1-linux-armv7-chrome-branding.tar.gz] and [nwjs-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz]
+  - [nwjs-v0.15.1-linux-armv7.tar.gz] and [nwjs-symbol-v0.15.1-linux-armv7.tar.gz]
+  - [nwjs-sdk-v0.15.1-linux-armv7-chrome-branding.tar.gz] and [nwjs-sdk-symbol-v0.15.1-linux-armv7-chrome-branding.tar.gz]
+  - [nwjs-sdk-v0.15.1-linux-armv7.tar.gz] and [nwjs-sdk-symbol-v0.15.1-linux-armv7.tar.gz]
+  - [nwjs-sdk-v0.14.6-linux-armv7-chrome-branding.tar.gz] and [nwjs-sdk-symbol-v0.14.6-linux-armv7-chrome-branding.tar.gz]
+  - [nwjs-sdk-v0.14.6-linux-armv7.tar.gz] and [nwjs-sdk-symbol-v0.14.6-linux-armv7.tar.gz]
+  - [nwjs-v0.12.2-linux-arm.tar.gz]
+  - [nwjs-v0.12.0-linux-arm.tar.gz]
 
 ### Tutorials
 
