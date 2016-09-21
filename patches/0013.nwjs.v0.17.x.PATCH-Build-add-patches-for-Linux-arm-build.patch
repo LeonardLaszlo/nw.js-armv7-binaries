@@ -1,0 +1,100 @@
+From 055fbc171c110f294b21d74df834b46588e1a4fd Mon Sep 17 00:00:00 2001
+From: jtg-gg <jefry.ted@vcube.co.jp>
+Date: Wed, 2 Mar 2016 20:24:04 +0800
+Subject: [PATCH] [Build] add patches for Linux arm build
+
+---
+ patch/patch.cfg                  | 12 ++++++++++++
+ patch/patches/node.patch         | 16 ++++++++++++++++
+ patch/patches/node_openssl.patch | 13 +++++++++++++
+ patch/patches/v8.patch           | 16 ++++++++++++++++
+ 4 files changed, 57 insertions(+)
+ create mode 100644 patch/patches/node.patch
+ create mode 100644 patch/patches/node_openssl.patch
+ create mode 100644 patch/patches/v8.patch
+
+diff --git a/patch/patch.cfg b/patch/patch.cfg
+index 76b837f..9506b21 100644
+--- a/patch/patch.cfg
++++ b/patch/patch.cfg
+@@ -1,5 +1,17 @@
+ patches = [
+   {
++      'name': 'node',
++      'path': 'src/third_party/node/',
++  },
++  {
++      'name': 'node_openssl',
++      'path': 'src/third_party/node/',
++  },
++  {
++      'name': 'v8',
++      'path': 'src/v8/',
++  },
++  {
+       'name': 'selenium',
+       'path': 'src/third_party/webdriver/pylib/',
+   },
+diff --git a/patch/patches/node.patch b/patch/patches/node.patch
+new file mode 100644
+index 0000000..997caa7
+--- /dev/null
++++ b/patch/patches/node.patch
+@@ -0,0 +1,16 @@
++diff --git a/deps/openssl/asm/arm-void-gas/modes/ghash-armv4.S b/deps/openssl/asm/arm-void-gas/modes/ghash-armv4.S
++index 6f699db..b3cda37 100644
++--- deps/openssl/asm/arm-void-gas/modes/ghash-armv4.S
+++++ deps/openssl/asm/arm-void-gas/modes/ghash-armv4.S
++@@ -4,8 +4,8 @@
++ .code	32
++ 
++ #ifdef __clang__
++-#define ldrplb	ldrbpl
++-#define ldrneb	ldrbne
+++//#define ldrplb	ldrbpl
+++//#define ldrneb	ldrbne
++ #endif
++ 
++ .type	rem_4bit,%object
++
+diff --git a/patch/patches/node_openssl.patch b/patch/patches/node_openssl.patch
+new file mode 100644
+index 0000000..74f31a7
+--- /dev/null
++++ b/patch/patches/node_openssl.patch
+@@ -0,0 +1,13 @@
++diff --git a/deps/openssl/openssl.gyp b/deps/openssl/openssl.gyp
++index 5ae63c0..d5a0800 100644
++--- deps/openssl/openssl.gyp
+++++ deps/openssl/openssl.gyp
++@@ -174,7 +174,7 @@
++         ]
++       }],
++       ['is_clang==1 or gcc_version>=43', {
++-        'cflags': ['-Wno-error=unused-command-line-argument', '-Wno-error=parentheses-equality'],
+++        'cflags': ['-Wno-error=unused-command-line-argument', '-Wno-error=parentheses-equality', '-no-integrated-as'],
++       }],
++       ['OS=="solaris"', {
++         'defines': ['__EXTENSIONS__'],
+diff --git a/patch/patches/v8.patch b/patch/patches/v8.patch
+new file mode 100644
+index 0000000..115416a
+--- /dev/null
++++ b/patch/patches/v8.patch
+@@ -0,0 +1,16 @@
++diff --git a/src/v8.gyp b/src/v8.gyp
++index 97661ab..c367ac8 100644
++--- src/v8.gyp
+++++ src/v8.gyp
++@@ -2290,11 +2290,6 @@
++             '<(icu_gyp_path):icuuc',
++           ]
++         }],
++-        ['want_separate_host_toolset==1', {
++-          'toolsets': ['host'],
++-        }, {
++-          'toolsets': ['target'],
++-        }],
++       ],
++     },
++     {
