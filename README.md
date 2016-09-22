@@ -1,6 +1,6 @@
 # NW.js ARMv7 binaries
 
-On versions v0.14.x, v0.15.x , v0.16.x the shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
+On versions v0.14.x, v0.15.x, v0.16.x, v0.17.x the shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
 
 If you don't want NW.js to store shared objects there, as an alternative, you can add the library where you store the shared objects to LD_LIBRARY_PATH environment variable, as shown below:
 
@@ -14,12 +14,14 @@ If you don't want to export the environment variable everytime you reboot you de
 
 You can find the step-by-step guides to build NW.js bellow:
 
+  - v0.17.x in file [docs/build-nwjs-v0.17.x.md],
   - v0.16.x in file [docs/build-nwjs-v0.16.x.md],
   - v0.15.x in file [docs/build-nwjs-v0.15.x.md],
   - v0.14.x in file [docs/build-nwjs-v0.14.x.md].
 
 ### Release log
 
+  - [nwjs-sdk-v0.17.5-linux-arm.tar.gz] -- (Chrome branding)
   - [nwjs-sdk-v0.16.2-linux-arm.tar.gz] -- (Chrome branding)
   - [nwjs-sdk-v0.15.5-linux-arm.tar.gz] -- (Chrome branding)
   - [nwjs-sdk-v0.14.7-linux-arm.tar.gz] -- (Chrome branding)
@@ -70,3 +72,4 @@ Thanks @gripped, @jtg-gg!
 [nwjs-sdk-v0.14.7-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.7-linux-arm-chrome-branding/nwjs-sdk-v0.14.7-linux-arm.tar.gz
 [nwjs-sdk-v0.15.5-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.15.5-linux-armv7-chrome-branding/nwjs-sdk-v0.15.5-linux-arm.tar.gz
 [nwjs-sdk-v0.16.2-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.16.2-linux-ARMv7-chrome-branding/nwjs-sdk-v0.16.2-linux-arm.tar.gz
+[nwjs-sdk-v0.17.5-linux-arm.tar.gz]:
