@@ -72,4 +72,4 @@ Thanks @gripped, @jtg-gg!
 [nwjs-sdk-v0.14.7-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.14.7-linux-arm-chrome-branding/nwjs-sdk-v0.14.7-linux-arm.tar.gz
 [nwjs-sdk-v0.15.5-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.15.5-linux-armv7-chrome-branding/nwjs-sdk-v0.15.5-linux-arm.tar.gz
 [nwjs-sdk-v0.16.2-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.16.2-linux-ARMv7-chrome-branding/nwjs-sdk-v0.16.2-linux-arm.tar.gz
-[nwjs-sdk-v0.17.5-linux-arm.tar.gz]:
+[nwjs-sdk-v0.17.5-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-sdk-v0.17.5-linux-ARMv7-chrome-branding/nwjs-sdk-v0.17.5-linux-arm.tar.gz
