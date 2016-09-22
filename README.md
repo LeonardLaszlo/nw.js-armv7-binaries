@@ -54,6 +54,7 @@ Thanks @gripped, @jtg-gg!
 [docs/build-nwjs-v0.14.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.14.x.md
 [docs/build-nwjs-v0.15.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.15.x.md
 [docs/build-nwjs-v0.16.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.16.x.md
+[docs/build-nwjs-v0.17.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.17.x.md
 
 [nwjs-v0.12.0-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.0-linux-ARMv7/nwjs-v0.12.0-linux-arm.tar.gz
 [nwjs-v0.12.2-linux-arm.tar.gz]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/releases/download/nwjs-v0.12.2-linux-ARMv7.tar.gz/nwjs-v0.12.2-linux-arm.tar.gz
