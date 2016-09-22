@@ -182,7 +182,7 @@ ninja -C out_gn_arm/nw dist
 
 This process can take few hours depending on your system configuration. Be patient!
 
-When the compilation is done you should find your artifacts under `$NWJS/src/out_arm/Release/dist/`.
+When the compilation is done you should find your artifacts under `$NWJS/src/out_gn_arm/nw/dist/`.
 
 [Xubuntu 16.04.1 LTS (Xenial Xerus)]: http://cdimage.ubuntu.com/xubuntu/releases/xenial/release/xubuntu-16.04.1-desktop-amd64.iso
 [Ubuntu 14.04.5 LTS (Trusty Tahr)]: http://releases.ubuntu.com/14.04/ubuntu-14.04.5-desktop-amd64.iso
