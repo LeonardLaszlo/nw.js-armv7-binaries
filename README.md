@@ -1,6 +1,6 @@
 # NW.js ARMv7 binaries
 
-On versions v0.14.x, v0.15.x, v0.16.x, v0.17.x, v0.18.x the shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
+On versions v0.14.x, v0.15.x, v0.16.x the shared object files located in 'lib' directory need to be copied to '/usr/lib' directory.
 
 If you don't want NW.js to store shared objects there, as an alternative, you can add the library where you store the shared objects to LD_LIBRARY_PATH environment variable, as shown below:
 
