@@ -107,7 +107,7 @@ export GYP_DEFINES="target_arch=arm arm_float_abi=hard nwjs_sdk=1 disable_nacl=0
 export GN_ARGS="is_debug=false is_component_ffmpeg=true enable_nacl=true is_official_build=true target_cpu=\"arm\" ffmpeg_branding=\"Chrome\""
 
 export GYP_CHROMIUM_NO_ACTION=1
-gclient sync --reset --with_branch_heads --nohooks
+gclient sync --reset --with_branch_heads
 ```
 
 This usually downloads 20G+ from GitHub and Google's Git repositories. Make sure you have a good network provider and be patient.
@@ -159,7 +159,7 @@ cd $NWJS/src/third_party/node/deps/openssl/
 git apply --check $NWJS/src/content/nw/patch/patches/node_openssl.patch
 cd $NWJS/src/v8/src
 git apply --check $NWJS/src/content/nw/patch/patches/v8.patch
-cd $NWJS
+cd $NWJS/src
 ```
 
 **Step 6.** Setup environment variables, synchronize projects and generate ninja build files with GN for Chromium:
