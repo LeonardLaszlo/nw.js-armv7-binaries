@@ -1,0 +1,23 @@
+From fd12fa8d8f6650f53ebfb160094f6bb0296c3faa Mon Sep 17 00:00:00 2001
+From: Jefry <jefry.ted@vcube.co.jp>
+Date: Sat, 12 Mar 2016 10:02:56 +0800
+Subject: [PATCH] [Build] linux arm cross compile fix, dump_syms should be host
+ only
+
+---
+ breakpad/breakpad.gyp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/breakpad/breakpad.gyp b/breakpad/breakpad.gyp
+index 88cb85f..eb8924a 100644
+--- a/breakpad/breakpad.gyp
++++ b/breakpad/breakpad.gyp
+@@ -449,7 +449,7 @@
+           # GN version: //breakpad:dump_syms
+           'target_name': 'dump_syms',
+           'type': 'executable',
+-          'toolsets': ['host', 'target'],
++          'toolsets': ['host'],
+ 
+           # dwarf2reader.cc uses dynamic_cast. Because we don't typically
+           # don't support RTTI, we enable it for this single target. Since
