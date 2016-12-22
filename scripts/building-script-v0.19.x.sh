@@ -16,7 +16,7 @@ export DEFAULT_BRANCH="$(curl https://api.github.com/repos/nwjs/nw.js | grep -Po
 
 gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/"${DEFAULT_BRANCH}"
 
-export MAGIC="        \"src/third_party/WebKit/LayoutTests\": None,\n        \"src/chrome_frame/tools/test/reference_build/chrome\": None,\n        \"src/chrome_frame/tools/test/reference_build/chrome_win\": None,\n        \"src/chrome/tools/test/reference_build/chrome\": None,\n        \"src/chrome/tools/test/reference_build/chrome_linux\": None,\n        \"src/chrome/tools/test/reference_build/chrome_mac\": None,\n        \"src/chrome/tools/test/reference_build/chrome_win\": None,"
+export MAGIC='"src/third_party/WebKit/LayoutTests": None, "src/chrome_frame/tools/test/reference_build/chrome": None, "src/chrome_frame/tools/test/reference_build/chrome_win": None, "src/chrome/tools/test/reference_build/chrome": None, "src/chrome/tools/test/reference_build/chrome_linux": None, "src/chrome/tools/test/reference_build/chrome_mac": None, "src/chrome/tools/test/reference_build/chrome_win": None,'
 
 awk -v values="${MAGIC}" '/custom_deps/ { print; print values; next }1' .gclient | cat > .gclient.temp
 mv .gclient.temp .gclient
@@ -45,6 +45,7 @@ export GYP_CHROMIUM_NO_ACTION=1
 gclient sync --reset --with_branch_heads
 
 cd $NWJS/src
+echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
 ./build/install-build-deps.sh --arm --no-prompt
 ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm
 
