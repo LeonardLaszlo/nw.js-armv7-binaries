@@ -12,14 +12,28 @@ export NWJS="$(pwd)"/nwjs
 cd $NWJS
 
 # get default branch of NW.js
-export DEFAULT_BRANCH="$(curl https://api.github.com/repos/nwjs/nw.js | grep -Po '(?<="default_branch": ")[^"]*')"
+# export DEFAULT_BRANCH="$(curl https://api.github.com/repos/nwjs/nw.js | grep -Po '(?<="default_branch": ")[^"]*')"
+
+DEFAULT_BRANCH=nw19
 
 gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/"${DEFAULT_BRANCH}"
 
-export MAGIC='"src/third_party/WebKit/LayoutTests": None, "src/chrome_frame/tools/test/reference_build/chrome": None, "src/chrome_frame/tools/test/reference_build/chrome_win": None, "src/chrome/tools/test/reference_build/chrome": None, "src/chrome/tools/test/reference_build/chrome_linux": None, "src/chrome/tools/test/reference_build/chrome_mac": None, "src/chrome/tools/test/reference_build/chrome_win": None,'
+# export MAGIC='"src/third_party/WebKit/LayoutTests": None, "src/chrome_frame/tools/test/reference_build/chrome": None, "src/chrome_frame/tools/test/reference_build/chrome_win": None, "src/chrome/tools/test/reference_build/chrome": None, "src/chrome/tools/test/reference_build/chrome_linux": None, "src/chrome/tools/test/reference_build/chrome_mac": None, "src/chrome/tools/test/reference_build/chrome_win": None,'
 
-awk -v values="${MAGIC}" '/custom_deps/ { print; print values; next }1' .gclient | cat > .gclient.temp
-mv .gclient.temp .gclient
+# awk -v values="${MAGIC}" '/custom_deps/ { print; print values; next }1' .gclient | cat > .gclient.temp
+# mv .gclient.temp .gclient
+
+# replace custom_deps manually with:
+
+# "custom_deps" : {
+#     "src/third_party/WebKit/LayoutTests": None,
+#     "src/chrome_frame/tools/test/reference_build/chrome": None,
+#     "src/chrome_frame/tools/test/reference_build/chrome_win": None,
+#     "src/chrome/tools/test/reference_build/chrome": None,
+#     "src/chrome/tools/test/reference_build/chrome_linux": None,
+#     "src/chrome/tools/test/reference_build/chrome_mac": None,
+#     "src/chrome/tools/test/reference_build/chrome_win": None,
+# }
 
 # clone some stuff
 mkdir -p $NWJS/src/content/nw
@@ -59,7 +73,8 @@ curl https://github.com/jtg-gg/chromium.src/commit/c270ee74e80bb993df00f0d929a00
 # [Linux][arm] disable the runtime check
 curl https://github.com/jtg-gg/chromium.src/commit/25bc987de045616ca04d2c4d2c0d502b06907dd4.patch | git am
 # [PATCH] Update DEPS
-curl https://github.com/jtg-gg/chromium.src/commit/887854c0698e3a655f589b190143d65b9e89a9c2.patch | git am
+# This one might be unnecessary
+# curl https://github.com/jtg-gg/chromium.src/commit/887854c0698e3a655f589b190143d65b9e89a9c2.patch | git am
 
 cd $NWJS/src/content/nw/
 
@@ -67,6 +82,8 @@ cd $NWJS/src/content/nw/
 curl https://github.com/jtg-gg/node-webkit/commit/a06a37ce92545aecab5f10dd6a743c08e916d1ac.patch | git am
 # [Build][Linux] add support for linux arm binary strip
 curl https://github.com/jtg-gg/node-webkit/commit/7dbcd433cf5ecca238c9fc1e3d6f095716328b7c.patch | git am
+
+cd $NWJS/src
 
 gclient runhooks
 gn gen out_gn_arm/nw --args="$GN_ARGS"
