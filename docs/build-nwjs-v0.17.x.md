@@ -95,7 +95,6 @@ cd $NWJS/src/third_party/node
 git checkout nw17
 cd $NWJS/src/v8
 git checkout nw17
-cd $NWJS
 ```
 
 **Step 3.** Export cross-compilation environment variables and synchronize the projects. To enable proprietary codecs set `ffmpeg_branding` to `Chrome` when you configure GN!
@@ -103,8 +102,8 @@ cd $NWJS
 ```bash
 cd $NWJS/src
 export GYP_CROSSCOMPILE="1"
-export GYP_DEFINES="target_arch=arm arm_float_abi=hard nwjs_sdk=1 disable_nacl=0 buildtype=Official"
-export GN_ARGS="is_debug=false is_component_ffmpeg=true enable_nacl=true is_official_build=true target_cpu=\"arm\" ffmpeg_branding=\"Chrome\""
+export GYP_DEFINES="target_arch=arm arm_float_abi=hard nwjs_sdk=1 disable_nacl=0"
+export GN_ARGS="is_debug=false is_component_ffmpeg=true enable_nacl=true target_cpu=\"arm\" ffmpeg_branding=\"Chrome\""
 
 export GYP_CHROMIUM_NO_ACTION=1
 gclient sync --reset --with_branch_heads
@@ -116,7 +115,6 @@ When finished, you will see a `src` folder in the same folder as `.gclient`.
 
 **Step 4.** The `install-build-deps` script should be used to install all the compiler and library dependencies directly from Ubuntu repositories:
 ```bash
-cd $NWJS/src
 ./build/install-build-deps.sh --arm
 ```
 
@@ -127,29 +125,27 @@ Install `sysroot` for ARM, might be automated by `gclient runhooks`:
 
 **Step 5.** Get some ARMv7 specific patches:
 ```bash
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0011.nwjs.v0.17.x.PATCH-Build-linux-arm-cross-compile-fix,-dump_syms-should-be-host.patch -P $NWJS/
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0012.nwjs.v0.17.x.PATCH-Build-gn-add-support-for-linux-arm-binary-strip.patch -P $NWJS/
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0013.nwjs.v0.17.x.PATCH-Build-add-patches-for-Linux-arm-build.patch -P $NWJS/
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0014.nwjs.v0.17.x.PATCH-Build-Linux-add-support-for-linux-arm-binary-strip.patch -P $NWJS/
+# [Build] linux arm cross compile fix, dump_syms should be host only
+curl -s https://github.com/jtg-gg/chromium.src/commit/f263069bd779e4ed3214b6daee207bdd68d25982.patch | git am
+
+# [Build][gn] add support for linux arm binary strip
+curl -s https://github.com/jtg-gg/chromium.src/commit/68d9aafe171d6dd57efeb8d50f552e925dffebfa.patch | git am
+
+# Update DEPS
+curl -s https://github.com/jtg-gg/chromium.src/commit/69a2a6c6fbb67f17c91718f55d2fd44a49c7da6e.patch | git am
+
+# [Build] add cherry-pick tool
+curl -s https://github.com/jtg-gg/chromium.src/commit/12e8e3bd57fe6c4b07de21fd2bf1a9500edcdbd2.patch | git am
+
+cd $NWJS/src/content/nw/
+
+# [Build] add patches for Linux arm build
+curl -s https://github.com/jtg-gg/node-webkit/commit/91fc077bbdfeb01804d61b7e45a2a2b3898f4ceb.patch | git am
+
+# [Build][Linux] add support for linux arm binary strip
+curl -s https://github.com/jtg-gg/node-webkit/commit/bc76b8c598825afa850bb16a75338a2d58b12ebd.patch | git am
 ```
 
-Check if patches apply cleanly and apply them:
-```bash
-# check
-git apply --check $NWJS/0011.nwjs.v0.17.x.PATCH-Build-linux-arm-cross-compile-fix,-dump_syms-should-be-host.patch
-git apply --check $NWJS/0012.nwjs.v0.17.x.PATCH-Build-gn-add-support-for-linux-arm-binary-strip.patch
-# apply
-git am $NWJS/0011.nwjs.v0.17.x.PATCH-Build-linux-arm-cross-compile-fix,-dump_syms-should-be-host.patch
-git am $NWJS/0012.nwjs.v0.17.x.PATCH-Build-gn-add-support-for-linux-arm-binary-strip.patch
-# check
-cd $NWJS/src/content/nw/
-git apply --check $NWJS/0013.nwjs.v0.17.x.PATCH-Build-add-patches-for-Linux-arm-build.patch
-git apply --check $NWJS/0014.nwjs.v0.17.x.PATCH-Build-Linux-add-support-for-linux-arm-binary-strip.patch
-# apply
-git am $NWJS/0013.nwjs.v0.17.x.PATCH-Build-add-patches-for-Linux-arm-build.patch
-git am $NWJS/0014.nwjs.v0.17.x.PATCH-Build-Linux-add-support-for-linux-arm-binary-strip.patch
-cd $NWJS
-```
 
 Check if added patches apply cleanly (optional step, but it helps debugging):
 ```bash
