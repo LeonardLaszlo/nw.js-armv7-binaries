@@ -103,8 +103,8 @@ cd $NWJS
 ```bash
 cd $NWJS/src
 export GYP_CROSSCOMPILE="1"
-export GYP_DEFINES="target_arch=arm arm_float_abi=hard nwjs_sdk=1 disable_nacl=0 buildtype=Official"
-export GN_ARGS="is_debug=false is_component_ffmpeg=true enable_nacl=true is_official_build=true target_cpu=\"arm\" ffmpeg_branding=\"Chrome\""
+export GYP_DEFINES="target_arch=arm arm_float_abi=hard nwjs_sdk=1 disable_nacl=0"
+export GN_ARGS="is_debug=false is_component_ffmpeg=true enable_nacl=true target_cpu=\"arm\" ffmpeg_branding=\"Chrome\""
 
 export GYP_CHROMIUM_NO_ACTION=1
 gclient sync --reset --with_branch_heads
@@ -127,28 +127,28 @@ Install `sysroot` for ARM, might be automated by `gclient runhooks`:
 
 **Step 5.** Get some ARMv7 specific patches:
 ```bash
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0015.nwjs.v0.18.x.PATCH-Build-linux-arm-cross-compile-fix,-dump_syms-should-be-host.patch -P $NWJS/
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0016.nwjs.v0.18.x.PATCH-Build-gn-add-support-for-linux-arm-binary-strip.patch -P $NWJS/
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0017.nwjs.v0.18.x.PATCH-Build-add-patches-for-Linux-arm-build.patch -P $NWJS/
-wget https://raw.githubusercontent.com/LeonardLaszlo/nw.js-armv7-binaries/master/patches/0018.nwjs.v0.18.x.PATCH-Build-Linux-add-support-for-linux-arm-binary-strip.patch -P $NWJS/
-```
+# [Build] linux arm cross compile fix, dump_syms should be host only
+curl -s https://github.com/jtg-gg/chromium.src/commit/14475969012bf5dd6671e7c9935798a1b558603b.patch | git am
 
-Check if patches apply cleanly and apply them:
-```bash
-# check
-git apply --check $NWJS/0015.nwjs.v0.18.x.PATCH-Build-linux-arm-cross-compile-fix,-dump_syms-should-be-host.patch
-git apply --check $NWJS/0016.nwjs.v0.18.x.PATCH-Build-gn-add-support-for-linux-arm-binary-strip.patch
-# apply
-git am $NWJS/0015.nwjs.v0.18.x.PATCH-Build-linux-arm-cross-compile-fix,-dump_syms-should-be-host.patch
-git am $NWJS/0016.nwjs.v0.18.x.PATCH-Build-gn-add-support-for-linux-arm-binary-strip.patch
-# check
+# [Build][gn] add support for linux arm binary strip
+curl -s https://github.com/jtg-gg/chromium.src/commit/564eed91934d2fa48da930f847334e3a21f64e42.patch | git am
+
+# Update DEPS
+curl -s https://github.com/jtg-gg/chromium.src/commit/445799771199078f40129b7e8c335f329b4fd601.patch | git am
+
+# [Build] add cherry-pick tool
+curl -s https://github.com/jtg-gg/chromium.src/commit/33a6200c47bb28c88d156ac09953300cd09c31f4.patch | git am
+
 cd $NWJS/src/content/nw/
-git apply --check $NWJS/0017.nwjs.v0.18.x.PATCH-Build-add-patches-for-Linux-arm-build.patch
-git apply --check $NWJS/0018.nwjs.v0.18.x.PATCH-Build-Linux-add-support-for-linux-arm-binary-strip.patch
-# apply
-git am $NWJS/0017.nwjs.v0.18.x.PATCH-Build-add-patches-for-Linux-arm-build.patch
-git am $NWJS/0018.nwjs.v0.18.x.PATCH-Build-Linux-add-support-for-linux-arm-binary-strip.patch
-cd $NWJS
+
+# [Build] add patches for Linux arm build
+curl -s https://github.com/jtg-gg/node-webkit/commit/28ca6960cc6cc5b1f3eb31c3a9812d5452e26002.patch | git am
+
+# [Build][Linux] add support for linux arm binary strip
+curl -s https://github.com/jtg-gg/node-webkit/commit/e12327453d1b97e6918e1e9a12e7f208c2a8b38d.patch | git am
+
+# [Build][NaCl] fix link error
+curl -s https://github.com/jtg-gg/node-webkit/commit/a38696099a10b4fc2dee1e21783ae4977eb47d92.patch | git am
 ```
 
 Check if added patches apply cleanly (optional step, but it helps debugging):
