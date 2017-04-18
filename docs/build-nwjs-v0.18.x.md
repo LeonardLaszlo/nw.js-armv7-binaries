@@ -2,19 +2,28 @@
 
 ### Environment setup
 
-First thing to do is to download [Xubuntu 16.04.1 LTS (Xenial Xerus)] and install it onto your favorite virtual machine. For this tutorial [VirtualBox] was chosen.
+Download and install [Xubuntu 16.04.1 LTS (Xenial Xerus)] on [VirtualBox].
 
-The host computer needs to have at least 60GB empty disk space and 16GB RAM. The guest machine needs 10GB RAM, 4GB swap area and 50GB disk space. It is recommended to use a high-speed storage device such an SSD or high-speed HDD. A fast internet connection is also an advantage.
+Host requirements:
 
-After the operating system installation is completed, in VirtualBox menu, click on Devices/Insert Guest Additions CD image. Next click on the CD icon in the Ubuntu menu bar, and run the auto-installer. When the installer is done, reboot the guest machine.
+  - 16GB RAM
+  - 60GB empty disk space (SSD or high-speed HDD)
+  - fast internet connection
 
-Next is recommended to update and upgrade the packages on the guest machine by running:
+Guest requirements:
+
+  - 10GB RAM
+  - 4GB swap
+  - 50GB disk space.
+
+
+Update and upgrade the packages on the guest os by running:
 ```bash
 sudo apt-get update
 sudo apt-get upgrade
 ```
 
-Next install Git and some monitoring tools if not installed:
+Install Git and monitoring tools:
 ```bash
 sudo apt-get install git htop sysstat
 ```
@@ -57,7 +66,7 @@ cd $NWJS
 gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/nw18
 ```
 
-You will probably want to put `NWJS` environment variable in your ~/.bashrc or ~/.zshrc.
+Put `NWJS` environment variable in your ~/.bashrc or ~/.zshrc.
 
 Generally if you are not interested in running Chromium tests, you don't have to sync the test cases and reference builds, which saves you lot of time. Open the `.gclient` file you just created and replace `custom_deps` section with followings:
 
@@ -90,12 +99,11 @@ git clone https://github.com/nwjs/nw.js $NWJS/src/content/nw
 git clone https://github.com/nwjs/node $NWJS/src/third_party/node
 git clone https://github.com/nwjs/v8 $NWJS/src/v8
 cd $NWJS/src/content/nw
-git checkout tags/nw-v0.18.8 -b nw-v0.18.8
+git checkout nw18
 cd $NWJS/src/third_party/node
-git checkout tags/nw-v0.18.8 -b nw-v0.18.8
+git checkout tags/nw-v0.18.8 -b v0.18.8
 cd $NWJS/src/v8
-git checkout tags/nw-v0.18.8 -b nw-v0.18.8
-cd $NWJS
+git checkout nw18
 ```
 
 **Step 3.** Export cross-compilation environment variables and synchronize the projects. To enable proprietary codecs set `ffmpeg_branding` to `Chrome` when you configure GN!
@@ -110,19 +118,11 @@ export GYP_CHROMIUM_NO_ACTION=1
 gclient sync --reset --with_branch_heads
 ```
 
-This usually downloads 20G+ from GitHub and Google's Git repositories. Make sure you have a good network provider and be patient.
+This usually downloads 20G+ from remote repositories.
 
-When finished, you will see a `src` folder in the same folder as `.gclient`.
-
-**Step 4.** The `install-build-deps` script should be used to install all the compiler and library dependencies directly from Ubuntu repositories:
+**Step 4.** Install all the compiler and library dependencies:
 ```bash
-cd $NWJS/src
 ./build/install-build-deps.sh --arm
-```
-
-Install `sysroot` for ARM, might be automated by `gclient runhooks`:
-```bash
-./build/linux/sysroot_scripts/install-sysroot.py --arch=arm
 ```
 
 **Step 5.** Get some ARMv7 specific patches:
@@ -162,7 +162,7 @@ git apply --check $NWJS/src/content/nw/patch/patches/v8.patch
 cd $NWJS/src
 ```
 
-**Step 6.** Setup environment variables, synchronize projects and generate ninja build files with GN for Chromium:
+**Step 6.** Setup environment variables and generate ninja build files with GN for Chromium:
 ```bash
 gn gen out_gn_arm/nw --args="$GN_ARGS"
 export GYP_CHROMIUM_NO_ACTION=0
@@ -180,7 +180,7 @@ ninja -C out_gn_arm/nw copy_node
 ninja -C out_gn_arm/nw dist
 ```
 
-This process can take few hours depending on your system configuration. Be patient!
+This process can take few hours depending on your system configuration.
 
 When the compilation is done you should find your artifacts under `$NWJS/src/out_gn_arm/nw/dist/`.
 
