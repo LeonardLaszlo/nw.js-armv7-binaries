@@ -90,11 +90,11 @@ git clone https://github.com/nwjs/nw.js $NWJS/src/content/nw
 git clone https://github.com/nwjs/node $NWJS/src/third_party/node
 git clone https://github.com/nwjs/v8 $NWJS/src/v8
 cd $NWJS/src/content/nw
-git checkout nw18
+git checkout tags/nw-v0.18.8 -b nw-v0.18.8
 cd $NWJS/src/third_party/node
-git checkout nw18
+git checkout tags/nw-v0.18.8 -b nw-v0.18.8
 cd $NWJS/src/v8
-git checkout nw18
+git checkout tags/nw-v0.18.8 -b nw-v0.18.8
 cd $NWJS
 ```
 
