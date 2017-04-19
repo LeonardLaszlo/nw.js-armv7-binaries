@@ -101,7 +101,7 @@ git clone https://github.com/nwjs/v8 $NWJS/src/v8
 cd $NWJS/src/content/nw
 git checkout nw18
 cd $NWJS/src/third_party/node
-git checkout tags/nw-v0.18.8 -b v0.18.8
+git checkout nw18
 cd $NWJS/src/v8
 git checkout nw18
 ```
@@ -166,7 +166,7 @@ cd $NWJS/src
 ```bash
 gn gen out_gn_arm/nw --args="$GN_ARGS"
 export GYP_CHROMIUM_NO_ACTION=0
-python build/gyp_chromium -Goutput_dir=out_gn_arm third_party/node/node.gyp
+./build/gyp_chromium -I third_party/node/common.gypi -I third_party/node/config.gypi third_party/node/node.gyp
 ```
 
 ### Build
