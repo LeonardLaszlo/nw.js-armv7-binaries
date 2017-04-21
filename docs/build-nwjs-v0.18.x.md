@@ -164,6 +164,7 @@ cd $NWJS/src
 
 **Step 6.** Setup environment variables and generate ninja build files with GN for Chromium:
 ```bash
+gclient runhooks
 gn gen out_gn_arm/nw --args="$GN_ARGS"
 export GYP_CHROMIUM_NO_ACTION=0
 ./build/gyp_chromium -I third_party/node/common.gypi -I third_party/node/config.gypi third_party/node/node.gyp
