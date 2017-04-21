@@ -13,7 +13,7 @@ Host requirements:
 Guest requirements:
 
   - 10GB RAM
-  - 4GB swap
+  - 10GB swap
   - 50GB disk space.
 
 
