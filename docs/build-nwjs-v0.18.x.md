@@ -99,11 +99,11 @@ git clone https://github.com/nwjs/nw.js $NWJS/src/content/nw
 git clone https://github.com/nwjs/node $NWJS/src/third_party/node
 git clone https://github.com/nwjs/v8 $NWJS/src/v8
 cd $NWJS/src/content/nw
-git checkout nw18
+git checkout tags/nw-v0.18.8 -b v0.18.8
 cd $NWJS/src/third_party/node
-git checkout nw18
+git checkout tags/nw-v0.18.8 -b v0.18.8
 cd $NWJS/src/v8
-git checkout nw18
+git checkout tags/nw-v0.18.8 -b v0.18.8
 ```
 
 **Step 3.** Export cross-compilation environment variables and synchronize the projects. To enable proprietary codecs set `ffmpeg_branding` to `Chrome` when you configure GN!
@@ -115,7 +115,7 @@ export GYP_DEFINES="target_arch=arm arm_float_abi=hard nwjs_sdk=1 disable_nacl=0
 export GN_ARGS="is_debug=false is_component_ffmpeg=true enable_nacl=true target_cpu=\"arm\" ffmpeg_branding=\"Chrome\""
 
 export GYP_CHROMIUM_NO_ACTION=1
-gclient sync --reset --with_branch_heads
+gclient sync --reset --with_branch_heads --nohooks
 ```
 
 This usually downloads 20G+ from remote repositories.
@@ -132,12 +132,6 @@ curl -s https://github.com/jtg-gg/chromium.src/commit/14475969012bf5dd6671e7c993
 
 # [Build][gn] add support for linux arm binary strip
 curl -s https://github.com/jtg-gg/chromium.src/commit/564eed91934d2fa48da930f847334e3a21f64e42.patch | git am
-
-# Update DEPS
-curl -s https://github.com/jtg-gg/chromium.src/commit/445799771199078f40129b7e8c335f329b4fd601.patch | git am
-
-# [Build] add cherry-pick tool
-curl -s https://github.com/jtg-gg/chromium.src/commit/33a6200c47bb28c88d156ac09953300cd09c31f4.patch | git am
 
 cd $NWJS/src/content/nw/
 
@@ -165,20 +159,20 @@ cd $NWJS/src
 **Step 6.** Setup environment variables and generate ninja build files with GN for Chromium:
 ```bash
 gclient runhooks
-gn gen out/nw --args="$GN_ARGS"
+gn gen out_gn_arm/nw --args="$GN_ARGS"
 export GYP_CHROMIUM_NO_ACTION=0
-./build/gyp_chromium -I third_party/node/common.gypi -I third_party/node/config.gypi third_party/node/node.gyp
+python build/gyp_chromium -Goutput_dir=out_gn_arm third_party/node/node.gyp
 ```
 
 ### Build
 
 Build NW.js and Node:
 ```bash
-ninja -C out/nw nwjs
-ninja -C out/nw v8_libplatform
-ninja -C out/Release node
-ninja -C out/nw copy_node
-ninja -C out/nw dist
+ninja -C out_gn_arm/nw nwjs
+ninja -C out_gn_arm/nw v8_libplatform
+ninja -C out_gn_arm/Release node
+ninja -C out_gn_arm/nw copy_node
+ninja -C out_gn_arm/nw dist
 ```
 
 This process can take few hours depending on your system configuration.
