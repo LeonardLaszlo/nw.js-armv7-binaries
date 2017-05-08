@@ -6,6 +6,7 @@ How to run NW.js on Linux ARMv7 devices:
 
 You can find the step-by-step guides to build NW.js bellow:
 
+  - v0.20.x in file [docs/build-nwjs-v0.20.x.md]
   - v0.19.x in file [docs/build-nwjs-v0.19.x.md]
   - v0.18.x in file [docs/build-nwjs-v0.18.x.md]
   - v0.17.x in file [docs/build-nwjs-v0.17.x.md]
@@ -46,3 +47,4 @@ Thanks **@gripped**, **@jtg-gg**!
 [docs/build-nwjs-v0.17.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.17.x.md
 [docs/build-nwjs-v0.18.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.18.x.md
 [docs/build-nwjs-v0.19.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.19.x.md
+[docs/build-nwjs-v0.20.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.20.x.md
