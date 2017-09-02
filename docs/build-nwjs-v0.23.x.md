@@ -63,7 +63,7 @@ git config --global color.ui true
 mkdir -p $HOME/nwjs
 export NWJS=$HOME/nwjs
 cd $NWJS
-gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/nw22
+gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/nw23
 ```
 
 Put `NWJS` environment variable in your ~/.bashrc or ~/.zshrc.
