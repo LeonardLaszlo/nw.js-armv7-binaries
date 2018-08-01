@@ -1,21 +1,10 @@
 # NW.js ARMv7 binaries
 
-How to run NW.js on Linux ARMv7 devices:
+After downloading the binary archive and unpacking it you can run NW.js on Linux ARMv7 devices with the following command:
 
 `./nw --use-gl=egl --ignore-gpu-blacklist --disable-accelerated-2d-canvas --num-raster-threads=2`
 
-You can find the step-by-step guides to build NW.js bellow:
-
-  - v0.23.x in file [docs/build-nwjs-v0.23.x.md]
-  - v0.22.x in file [docs/build-nwjs-v0.22.x.md]
-  - v0.21.x in file [docs/build-nwjs-v0.21.x.md]
-  - v0.20.x in file [docs/build-nwjs-v0.20.x.md]
-  - v0.19.x in file [docs/build-nwjs-v0.19.x.md]
-  - v0.18.x in file [docs/build-nwjs-v0.18.x.md]
-  - v0.17.x in file [docs/build-nwjs-v0.17.x.md]
-  - v0.16.x in file [docs/build-nwjs-v0.16.x.md]
-  - v0.15.x in file [docs/build-nwjs-v0.15.x.md]
-  - v0.14.x in file [docs/build-nwjs-v0.14.x.md]
+The step-by-step guide to build NW.js is located under the `docs` directory.
 
 ### Tutorials
 
@@ -40,17 +29,6 @@ If you don't want NW.js to store shared objects there, as an alternative, you ca
 
 `export LD_LIBRARY_PATH=/path/to/nwjs/nwjs-v0.15.1-linux-arm/lib:$LD_LIBRARY_PATH`
 
-If you don't want to export the environment variable everytime you reboot you device you can add the export line to the end of **.bashrc** file.
+If you don't want to export the environment variable every time you reboot you device you can add the export line to the end of **.bashrc** file.
 
 Thanks **@gripped**, **@jtg-gg**!
-
-[docs/build-nwjs-v0.14.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.14.x.md
-[docs/build-nwjs-v0.15.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.15.x.md
-[docs/build-nwjs-v0.16.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.16.x.md
-[docs/build-nwjs-v0.17.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.17.x.md
-[docs/build-nwjs-v0.18.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.18.x.md
-[docs/build-nwjs-v0.19.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.19.x.md
-[docs/build-nwjs-v0.20.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.20.x.md
-[docs/build-nwjs-v0.21.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.21.x.md
-[docs/build-nwjs-v0.22.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.22.x.md
-[docs/build-nwjs-v0.23.x.md]: https://github.com/LeonardLaszlo/nw.js-armv7-binaries/blob/master/docs/build-nwjs-v0.23.x.md
