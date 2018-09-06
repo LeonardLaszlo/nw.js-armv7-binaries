@@ -142,6 +142,18 @@ curl -s https://github.com/jtg-gg/chromium.src/commit/65f2215706692e438ca3570be6
 # [Build][gn] add support for linux arm binary strip
 curl -s https://github.com/jtg-gg/chromium.src/commit/2a3ca533a4dd2552889bd18cd4343809f13876c4.patch | git am &&
 
+# Update DEPS
+curl -s https://github.com/jtg-gg/chromium.src/commit/8c13d9d6de27201ed71529f77f38b39e0aafc184.patch | git am &&
+
+# [Build] compile error fixes
+curl -s https://github.com/jtg-gg/chromium.src/commit/5e4bd4d9d03f81623074334bf030d13fce968c1b.patch | git am &&
+
+# [DCHECK] ignore always crashing dcheck
+curl -s https://github.com/jtg-gg/chromium.src/commit/58c7eb31c1e9390325da21ccc7f718f1b1b019d2.patch | git am &&
+
+# [Build] add cherry-pick tool
+curl -s https://github.com/jtg-gg/chromium.src/commit/cdc6ede7e5e4979ebbcc58492c7b576a07350152.patch | git am &&
+
 cd $NWJS/src/content/nw/ &&
 
 # [Build] add patches for Linux arm build
