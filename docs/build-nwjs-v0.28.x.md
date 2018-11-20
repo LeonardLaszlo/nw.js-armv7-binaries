@@ -102,7 +102,7 @@ git clone https://github.com/nwjs/v8 $NWJS/src/v8
 git fetch --tags --prune
 git reset --hard HEAD
 git checkout nw28
-# git checkout tags/nw-v0.27.5 -b nw-v0.27.5
+# git checkout tags/nw-v0.28.2 -b nw-v0.28.2
 
 cd $NWJS/src/content/nw
 git fetch --tags --prune
