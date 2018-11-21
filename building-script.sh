@@ -5,16 +5,55 @@
 
 set -e
 
-export NWJS_BRANCH=nw32
+export NWJS_BRANCH=nw33
 
 CHROMIUM_PATCHES=(
-deee0544bf6a380aefc414622186e2c0c2d4077a
-ef3b888560bce97a4120ac4771454b43f1216bfe
+fe84048a681bf82b6d0b5dcb106047416f637e80
+0ae6c0ea6a3dd41137e4c79fdd76782b494d902f
+86fd0cc5bba9d5a29200939c0ce51e3d7a88e1e8
+03439d024a0e0710f1aa643cf306ecef7a99851e
+38d223bee64d375736f7239475a6c348bc083ddd
+4a01e095065f92c658882e3ca7167013336a1eaf
+e9de7508498657b3c9d86deb25a9470b8b8165b1
+d0d1fa043be6afde8b54951d2a31d78991f18650
+aaeb74aff7786a514ebaf3e1bccf3bd660efcff1
+5924b1f519f966c5659b4988c2e7512a128c6a9a
+cd2c081ee4048e21a35cca16eb8d44f9d66bd81a
+5955bdba71efe837b9e72dd4794f95e1124ab8a7
+82d53126cf86d64dbfab71591660ec49616b5282
+16219181323d41817b3bc1291a5c2d01768daf45
+36c907888d4da3c27c77ce17eba1132b7994637b
+3805a44f70ca50e80af9464e99a3e1ff2bc99d42
+c8706c0fd2eeb5782efcf1eb3b62108b9cc4408c
+765aff9833cd34faedc45abdefa01e8584072458
+f5966f10581982fb3ff116b61f42c670267c00fa
+d8db2d35aea619ff66c8d29091fa642854a17fb1
+80e563a1e68fab5d497dcb552e2bafed8d217f56
+003022eebb659b1f571b3df0e97bcf503d844bd1
 )
 
 NODE_WEBKIT_PATCHES=(
-84e6d0be845dbd92cb9ac3b885f1e5c711da0548
-f593ab464481b0ba246ebc330c7f5d21622eb879
+62e89c34ecdaca4fdacb878ebc5e511669052c2c
+71c87ea8fb0e64173b9be7d655e0666083f55d33
+4c66c33cdbf1432e5a3798f37bb5f775c2d22981
+2ada203f329342c18676cfa79d27dc093d354288
+9ade4e7493a24b91ff350ae39c32ca936b91d028
+dfc7e972155f8f4f9122250f2af78b904cfdaafb
+993ec4bb279bd5fc2c0c9e3e11a521f8dda8f215
+694c9f08c0772e0f132ce37dae92c69ab3022dd8
+790e284e078e5f4342e05957b3bb89379fbe185e
+2139b3efb04288b3532d09038e9f3080109b2a8f
+191e94a54e8b553b256dd26be1030e4810aaf16a
+73a41445fa00251b348820a8b7d305574d9c73ec
+2ff95c4e1e8ea3a31137257b12c25eee1293e699
+2d58167de97b8ffd2aaa8847cda523b1258c11d5
+f518df35066e5d75000fa2b4bb9bcf3183a3ac7c
+c4def3785d9a9b5cb028648f71ddd3612ac257fd
+56cc85ea956ad2a42f3115be4955a10469ed36a6
+7c2c0c2d6b43590d71bc1f1cc07566ab36ca8eba
+b85dd85158e9efdca7db1d1b582535800d37a701
+9d7b042cb041e28b0b886e80a239b64926f8591e
+644cbfafd6f04e438b64c23c9c545e229b0b3ca5
 )
 
 export GYP_CROSSCOMPILE="1"
@@ -119,8 +158,9 @@ function updateNwjsRepository {
   cd $NWJS/src
   # git clean -fdx
   gclient sync --reset --with_branch_heads --nohooks
+  cd $NWJS/src
   sudo sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
-  ./build/install-build-deps.sh --arm --no-prompt
+  $NWJS/src/build/install-build-deps.sh --arm --no-prompt
 }
 
 function getAndApplyPatches {
@@ -158,8 +198,8 @@ function build {
 # updateAndInstallMissingUbuntuPackages
 # configureGit
 # getOrUpdateDepotTools
-createGclientConfig
-updateCustomDependencies
+# createGclientConfig
+# updateCustomDependencies
 getOrUpdateGitRepository "https://github.com/nwjs/nw.js" "$NWJS/src/content/nw"
 getOrUpdateGitRepository "https://github.com/nwjs/node" "$NWJS/src/third_party/node"
 getOrUpdateGitRepository "https://github.com/nwjs/v8" "$NWJS/src/v8"
