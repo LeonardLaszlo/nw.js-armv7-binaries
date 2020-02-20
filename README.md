@@ -8,7 +8,19 @@ After downloading the binary archive and unpacking it you can run NW.js on Linux
 
 `./nw --use-gl=egl --ignore-gpu-blacklist --disable-accelerated-2d-canvas --num-raster-threads=2`
 
-The step-by-step guides to build NW.js are located under the [docs][2] directory. This repo also contains a `building-script.sh` for a more convenient build experience.
+### Docker
+
+Build the environment:
+
+``` Bash
+docker image build -t laslaul/nwjs-arm-build-env:1.0 .
+```
+
+Start the environment:
+
+``` Bash
+docker run -it laslaul/nwjs-arm-build-env:1.0
+```
 
 ### Tutorials
 
