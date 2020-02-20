@@ -1,0 +1,50 @@
+From 597e2ed08849ccfc9e217e0b588482c9bffa20cb Mon Sep 17 00:00:00 2001
+From: Marcus T <llamasoft@rm-rf.email>
+Date: Fri, 14 Feb 2020 09:44:41 -0500
+Subject: [PATCH 1/2] Update common.gypi to allow for ARM builds
+
+Chromium's build scripts support building for ARM architectures so long as the ARM sysroot image is installed.
+---
+ common.gypi | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/common.gypi b/common.gypi
+index e44385eefb..f4d6f6c2e2 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -122,6 +122,9 @@
+       ['OS=="linux" and target_arch=="x64" and <(building_nw)==1', {
+         'sysroot': '<!(cd <(DEPTH) && pwd -P)/build/linux/debian_sid_amd64-sysroot',
+       }],
++      ['OS=="linux" and target_arch=="arm" and <(building_nw)==1', {
++        'sysroot': '<!(cd <(DEPTH) && pwd -P)/build/linux/debian_sid_arm-sysroot',
++      }],
+       ['openssl_fips != ""', {
+         'openssl_product': '<(STATIC_LIB_PREFIX)crypto<(STATIC_LIB_SUFFIX)',
+       }, {
+
+From 4d6b4a85033321838b3dc2725f5dddbb5fe69414 Mon Sep 17 00:00:00 2001
+From: Marcus T <llamasoft@rm-rf.email>
+Date: Mon, 17 Feb 2020 20:15:57 -0500
+Subject: [PATCH 2/2] Update build script to support cross-compiling for ARM
+
+In addition to the sysroot change, this modification allows node to be cross-compiled for ARM when built using clang.
+---
+ common.gypi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/common.gypi b/common.gypi
+index f4d6f6c2e2..e43f5f0220 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -537,6 +537,10 @@
+             'cflags': [ '--sysroot=<(sysroot)', '-nostdinc++', '-isystem<(DEPTH)/buildtools/third_party/libc++/trunk/include', '-isystem<(DEPTH)/buildtools/third_party/libc++abi/trunk/include' ],
+             'ldflags': [ '--sysroot=<(sysroot)','<!(<(DEPTH)/content/nw/tools/sysroot_ld_path.sh <(sysroot))', '-nostdlib++' ],
+           }],
++          [ 'OS=="linux" and target_arch=="arm"', {
++            'cflags': [ '--target=arm-linux-gnueabihf' ],
++            'ldflags': [ '--target=arm-linux-gnueabihf' ],
++          }],
+           [ 'target_arch=="ppc" and OS!="aix"', {
+             'cflags': [ '-m32' ],
+             'ldflags': [ '-m32' ],
