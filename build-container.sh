@@ -3,7 +3,7 @@
 set -e
 
 export NWJS_BRANCH="nw44"
-export WORKDIR="/usr/src/nwjs"
+export WORKDIR="/usr/docker"
 export NWJSDIR="$WORKDIR/nwjs"
 export DEPOT_TOOLS_DIRECTORY="$WORKDIR/depot_tools"
 export PATH=$PATH:$DEPOT_TOOLS_DIRECTORY
@@ -11,9 +11,13 @@ export PATH=$PATH:$DEPOT_TOOLS_DIRECTORY
 export DEPOT_TOOLS_REPO="https://chromium.googlesource.com/chromium/tools/depot_tools.git"
 
 function getNecessaryUbuntuPackages {
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get -y install software-properties-common apt-utils tzdata
+  add-apt-repository ppa:deadsnakes/ppa
   apt-get update
   apt-get -y upgrade
-  apt-get -y install curl wget git python file lsb-release sudo gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+  apt-get -y install curl wget nano git python file lsb-release sudo gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
   apt-get autoclean
   apt-get autoremove
   git config --global user.email "you@example.com"
