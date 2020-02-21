@@ -2,13 +2,11 @@
 
 set -e
 
-export WORKDIR="/usr/src/nwjs"
+export WORKDIR="/usr/docker"
 
 export GYP_CROSSCOMPILE="1"
 export GYP_DEFINES="OS=linux building_nw=1 buildtype=Official clang=1 is_debug=false is_component_ffmpeg=true target_arch=arm target_cpu=\"arm\" arm_float_abi=hard"
 export GYP_CHROMIUM_NO_ACTION=0
-
-export DEPOT_TOOLS_REPO="https://chromium.googlesource.com/chromium/tools/depot_tools.git"
 
 export DEPOT_TOOLS_DIRECTORY=$WORKDIR/depot_tools
 export NWJSDIR=$WORKDIR/nwjs
@@ -46,11 +44,6 @@ read branchName
 export NWJS_BRANCH="$branchName"
 echo Start building branch $NWJS_BRANCH
 
-function getDepotTools {
-  rm -rf "$DEPOT_TOOLS_DIRECTORY"
-  git clone --depth 1 "$DEPOT_TOOLS_REPO" "$DEPOT_TOOLS_DIRECTORY"
-}
-
 function configureGclientForNwjs {
   cd "$NWJSDIR"
   cat <<CONFIG > ".gclient"
@@ -81,34 +74,12 @@ function getGitRepository {
   git clone --depth 1 --branch "${NWJS_BRANCH}" "$REPO_URL" "$REPO_DIR"
 }
 
-# Unused
-function updateGitRepository {
-  REPO_URL=$1
-  REPO_DIR=$2
-  cd $REPO_DIR
-  git fetch --all --tags --prune --prune-tags
-  git reset --hard HEAD
-  # git am --abort || true
-  git checkout $NWJS_BRANCH
-  git reset --hard origin/$NWJS_BRANCH
-  # git clean -fdx
-}
-
 function updateNwjsRepository {
   cd $NWJSDIR/src
   gclient sync --reset --with_branch_heads
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
   $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
   $NWJSDIR/src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
-}
-
-# Not needed since v0.44.x
-function getAndApplyPatches {
-  cd $NWJSDIR/src/third_party/node-nw
-  git am $WORKDIR/node-nw.patch
-
-  cd $NWJSDIR/src/content/nw/
-  git apply --reject --whitespace=fix  $WORKDIR/nwjs.patch
 }
 
 function build {
@@ -138,13 +109,11 @@ STRIP_SCRIPT
   ninja -C out/nw dist
 }
 
-getDepotTools
 configureGclientForNwjs
 getGitRepository "https://github.com/nwjs/nw.js" "$NWJSDIR/src/content/nw"
 getGitRepository "https://github.com/nwjs/node" "$NWJSDIR/src/third_party/node-nw"
 getGitRepository "https://github.com/nwjs/v8" "$NWJSDIR/src/v8"
 updateNwjsRepository
-# getAndApplyPatches
 build
 cd $WORKDIR
 
