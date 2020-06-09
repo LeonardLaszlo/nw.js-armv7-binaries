@@ -32,15 +32,10 @@ Cross compilation [tutorial][5] for v0.14.x
 
 [Chrome branding][6] (enable proprietary codecs)
 
-### Issues
+### Older versions
 
-With versions **v0.14.x**, **v0.15.x**, **v0.16.x** the shared object files located in *lib* directory need to be copied to */usr/lib* directory.
-
-If you don't want NW.js to store shared objects there, as an alternative, you can add the library where you store the shared objects to **LD_LIBRARY_PATH** environment variable, as shown below:
-
-`export LD_LIBRARY_PATH=/path/to/nwjs/nwjs-v0.15.1-linux-arm/lib:$LD_LIBRARY_PATH`
-
-If you don't want to export the environment variable every time you reboot you device you can add the export line to the end of **.bashrc** file.
+For building older versions please check the [docs][2] directory.
+Most probably each version will require extra tweaks in order to build.
 
 Thanks **@gripped**, **@jtg-gg**!
 
