@@ -1,5 +1,5 @@
-# docker image build -t laslaul/nwjs-arm-build-env:1.1 .
-# docker run -it laslaul/nwjs-arm-build-env:1.1
+# docker image build -t laslaul/nwjs-arm-build-env:v0.45.x .
+# docker run -it laslaul/nwjs-arm-build-env:v0.45.x
 
 # Use the official image as a parent image
 FROM ubuntu:18.04
