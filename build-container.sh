@@ -4,20 +4,20 @@ set -e
 
 export NWJS_BRANCH="nw45"
 export WORKDIR="/usr/docker"
-export NWJSDIR="$WORKDIR/nwjs"
-export DEPOT_TOOLS_DIRECTORY="$WORKDIR/depot_tools"
-export PATH=$PATH:$DEPOT_TOOLS_DIRECTORY
+export NWJSDIR="${WORKDIR}/nwjs"
+export DEPOT_TOOLS_DIRECTORY="${WORKDIR}/depot_tools"
+export PATH=${PATH}:${DEPOT_TOOLS_DIRECTORY}
 
 export DEPOT_TOOLS_REPO="https://chromium.googlesource.com/chromium/tools/depot_tools.git"
 
 function getNecessaryUbuntuPackages {
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
-  apt-get -y install software-properties-common apt-utils tzdata
-  add-apt-repository ppa:deadsnakes/ppa
-  apt-get update
   apt-get -y upgrade
-  apt-get -y install curl wget nano git python file lsb-release sudo gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+  apt-get -y install apt-utils git curl lsb-release sudo tzdata
+  echo "Europe/Zurich" > /etc/timezone
+  dpkg-reconfigure -f noninteractive tzdata
+  apt-get -y install python
   apt-get autoclean
   apt-get autoremove
   git config --global user.email "you@example.com"
@@ -60,7 +60,7 @@ function getGitRepository {
 
 function getNwjsRepository {
   cd $NWJSDIR/src
-  gclient sync --reset --with_branch_heads --nohooks
+  gclient sync --with_branch_heads --nohooks
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
   $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
   $NWJSDIR/src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
