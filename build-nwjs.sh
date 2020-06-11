@@ -99,3 +99,6 @@ build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\" is_component_ff
 if [ -d "${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding" ]; then rm -r ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding; fi
 mkdir -p ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
+
+# docker cp 3f4cdbf38dc2:/usr/docker/dist .
+# tar -zcvf v0.45.7.tar.gz v0.45.7
