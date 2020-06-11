@@ -10,6 +10,7 @@ WORKDIR /usr/docker
 # Copy the files from your host to your current location
 COPY build-container.sh .
 COPY build-nwjs.sh .
+COPY checkout-another-branch.sh .
 
 # Run the command inside your image filesystem
 RUN /usr/docker/build-container.sh
