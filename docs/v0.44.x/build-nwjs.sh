@@ -38,7 +38,7 @@ index 3f15d567deca..5c055eb03896 100644
 -  } else {
 -    source = "nwjs_resources.grd"
 -  }
-+  source = "nwjs_resources.grd"
++  source = "browser_resources.grd"
 
    # The .grd contains references to generated files.
    source_is_generated = true
