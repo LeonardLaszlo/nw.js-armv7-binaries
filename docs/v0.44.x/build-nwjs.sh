@@ -76,29 +76,27 @@ STRIP_SCRIPT
 
 applyPatch
 
+if [ -d "${WORKDIR}/dist" ]; then rm -r ${WORKDIR}/dist; fi
+
 export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
 build "nwjs_sdk=true enable_nacl=true is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
-if [ -d "${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding" ]; then rm -r ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding; fi
 mkdir -p ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
 
 export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
 build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\" is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
-if [ -d "${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding" ]; then rm -r ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding; fi
 mkdir -p ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
 
 export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
 build "nwjs_sdk=false enable_nacl=false is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
-if [ -d "${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding" ]; then rm -r ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding; fi
 mkdir -p ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
 
 export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
 build "nwjs_sdk=false enable_nacl=false ffmpeg_branding=\"Chrome\" is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
-if [ -d "${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding" ]; then rm -r ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding; fi
 mkdir -p ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
 
-# docker cp 3f4cdbf38dc2:/usr/docker/dist .
-# tar -zcvf v0.44.x.tar.gz v0.44.x
+# tar -zcvf v0.44.6.tar.gz dist/*
+# docker cp 3f4cdbf38dc2:/usr/docker/v0.44.6.tar.gz .
