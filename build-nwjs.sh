@@ -42,8 +42,6 @@ index ab737dc95735..1ee73267ad15 100644
 
    # The .grd contains references to generated files.
    source_is_generated = true
---
-2.17.1
 PATCH
 }
 
