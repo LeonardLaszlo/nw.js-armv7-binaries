@@ -70,7 +70,7 @@ function getNwjsRepository {
 getNecessaryUbuntuPackages
 getDepotTools
 configureGclientForNwjs
+getNwjsRepository
 getGitRepository "https://github.com/nwjs/nw.js" "$NWJSDIR/src/content/nw"
 getGitRepository "https://github.com/nwjs/node" "$NWJSDIR/src/third_party/node-nw"
 getGitRepository "https://github.com/nwjs/v8" "$NWJSDIR/src/v8"
-getNwjsRepository
