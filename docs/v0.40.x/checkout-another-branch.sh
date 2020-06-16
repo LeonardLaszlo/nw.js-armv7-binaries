@@ -44,11 +44,11 @@ function getNwjsRepository {
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
   $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
   $NWJSDIR/src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
+  getGitRepository "https://github.com/nwjs/nw.js" "$NWJSDIR/src/content/nw"
+  getGitRepository "https://github.com/nwjs/node" "$NWJSDIR/src/third_party/node-nw"
+  getGitRepository "https://github.com/nwjs/v8" "$NWJSDIR/src/v8"
   gclient runhooks
 }
 
 configureGclientForNwjs
 getNwjsRepository
-getGitRepository "https://github.com/nwjs/nw.js" "$NWJSDIR/src/content/nw"
-getGitRepository "https://github.com/nwjs/node" "$NWJSDIR/src/third_party/node-nw"
-getGitRepository "https://github.com/nwjs/v8" "$NWJSDIR/src/v8"
