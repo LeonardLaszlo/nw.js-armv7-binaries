@@ -32,6 +32,12 @@ Thanks **@gripped**, **@jtg-gg** and **@llamasoft**!
 
 Building NW.js on supported platforms [tutorial][4]
 
+https://gist.github.com/llamasoft/33af03b73945a84d7624460d67b922ab
+
+https://github.com/nwjs/nw.js/issues/1151
+
+https://github.com/nwjs/nw.js/issues/7378
+
 Cross compilation [tutorial][3] for v0.12.x
 
 Cross compilation [tutorial][5] for v0.14.x
