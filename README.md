@@ -1,8 +1,10 @@
 # NW.js ARMv7 binaries
 
-### Instructions for running your NW.js application on Linux ARMv7
+This repository is meant to host the executable NW.js ARMv7 binaries under the [Releases][1] tab. As a curtesy it also provides the documentation to reproduce these builds (for newer versions under the form of shell scripts). See the [docs][2] directory.
 
-Executable binaries are available for download under the [Releases][1] tab.
+Please note the releases are not necessarily done chronologically. They are done on a best effort basis. Thank you for your understanding!
+
+### Instructions for running your NW.js application on Linux ARMv7
 
 After downloading the binary archive and unpacking it you can run NW.js on Linux ARMv7 devices with the following command:
 
@@ -12,7 +14,7 @@ After downloading the binary archive and unpacking it you can run NW.js on Linux
 
 Building NW.js requires a bunch of resources.
 The build was done with a new installation of Docker.
-Use as many CPU cores as possible and at least 10 GB of RAM, 4GB swap and 100 GB of disk.
+Use as many CPU cores as possible and at least 10 GB of RAM, 4GB swap and 110 GB of disk.
 
 ``` Bash
 docker image build -t laslaul/nwjs-arm-build-env:v0.45.x .
@@ -24,7 +26,7 @@ Start the environment:
 docker run -it laslaul/nwjs-arm-build-env:v0.45.x
 ```
 
-Thanks **@gripped**, **@jtg-gg** and **llamasoft**!
+Thanks **@gripped**, **@jtg-gg** and **@llamasoft**!
 
 ### Further reading
 
