@@ -79,6 +79,7 @@ PATCH
    # The .grd contains references to generated files.
    source_is_generated = true
 PATCH
+
   cd $NWJSDIR/src/third_party/node-nw
   patch -p0 --ignore-whitespace << 'PATCH'
 --- common.gypi

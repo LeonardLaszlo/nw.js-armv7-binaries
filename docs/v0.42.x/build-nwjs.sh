@@ -59,23 +59,13 @@ function applyPatch {
 PATCH
 
   # See https://gist.github.com/llamasoft/33af03b73945a84d7624460d67b922ab
-  ################################### Patches ####################################
-
   # For nwjs_sdk=false builds, some required(?) files never get built.
   # As a workaround, always use the SDK's GRIT input regardless of the flag.
-  #   See: https://github.com/nwjs/chromium.src/issues/145
-  git am <<'PATCH' || git am --abort
-From dc3860edac430b1635050141343f6b6b34b1c451 Mon Sep 17 00:00:00 2001
-From: llamasoft <llamasoft@rm-rf.email>
-Date: Thu, 20 Feb 2020 18:17:06 -0500
-Subject: [PATCH] Always use SDK GRIT input file
----
- chrome/browser/BUILD.gn | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index c8ccd7c2292d..805e987fc4ae 100644
---- a/chrome/browser/BUILD.gn
-+++ b/chrome/browser/BUILD.gn
+  # See: https://github.com/nwjs/chromium.src/issues/145
+  cd $NWJSDIR/src
+  patch -p0 --ignore-whitespace << 'PATCH'
+--- chrome/browser/BUILD.gn
++++ chrome/browser/BUILD.gn
 @@ -5238,11 +5238,7 @@ proto_library("resource_prefetch_predictor_proto") {
  }
 
@@ -90,6 +80,7 @@ index c8ccd7c2292d..805e987fc4ae 100644
    # The .grd contains references to generated files.
    source_is_generated = true
 PATCH
+
   cd $NWJSDIR/src/third_party/node-nw
   git am <<'PATCH' || git am --abort
 From 597e2ed08849ccfc9e217e0b588482c9bffa20cb Mon Sep 17 00:00:00 2001
