@@ -85,5 +85,5 @@ build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\" is_component_ff
 mkdir -p ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
 
-# tar -zcvf v0.46.5.tar.gz dist/*
-# docker cp 3f4cdbf38dc2:/usr/docker/v0.46.5.tar.gz .
+# tar -zcvf v0.47.3.tar.gz dist/*
+# docker cp 6c2287d4b8cc:/usr/docker/v0.47.3.tar.gz binaries/
