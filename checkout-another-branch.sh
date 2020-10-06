@@ -2,7 +2,7 @@
 
 set -e
 
-export NWJS_BRANCH="nw47"
+export NWJS_BRANCH="nw48"
 export WORKDIR="/usr/docker"
 export NWJSDIR="${WORKDIR}/nwjs"
 export DEPOT_TOOLS_DIRECTORY="${WORKDIR}/depot_tools"
