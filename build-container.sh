@@ -2,7 +2,7 @@
 
 set -e
 
-export NWJS_BRANCH="nw47"
+export NWJS_BRANCH="nw48"
 export WORKDIR="/usr/docker"
 export NWJSDIR="${WORKDIR}/nwjs"
 export DEPOT_TOOLS_DIRECTORY="${WORKDIR}/depot_tools"
@@ -17,7 +17,7 @@ function getNecessaryUbuntuPackages {
   apt-get -y install apt-utils git curl lsb-release sudo tzdata nano
   echo "Europe/Zurich" > /etc/timezone
   dpkg-reconfigure -f noninteractive tzdata
-  apt-get -y install python
+  apt-get -y install python python-setuptools
   apt-get autoclean
   apt-get autoremove
   git config --global user.email "you@example.com"
