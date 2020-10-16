@@ -1,0 +1,8 @@
+.dockerignore
+.git
+.gitignore
+.DS_Store
+*.tar.gz
+binaries/
+docs/
+README.MD
