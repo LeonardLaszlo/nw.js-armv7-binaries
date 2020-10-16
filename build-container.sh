@@ -2,7 +2,7 @@
 
 set -e
 
-export NWJS_BRANCH="nw48"
+export NWJS_BRANCH="$1"
 export WORKDIR="/usr/docker"
 export NWJSDIR="${WORKDIR}/nwjs"
 export DEPOT_TOOLS_DIRECTORY="${WORKDIR}/depot_tools"
@@ -59,7 +59,7 @@ function getGitRepository {
 }
 
 function getNwjsRepository {
-  cd $NWJSDIR/src
+  mkdir $NWJSDIR/src && cd $NWJSDIR/src
   gclient sync --with_branch_heads --nohooks
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
   $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
