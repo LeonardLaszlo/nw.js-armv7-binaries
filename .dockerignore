@@ -3,6 +3,6 @@
 .gitignore
 .DS_Store
 *.tar.gz
+.archive/
 binaries/
-docs/
 README.MD
