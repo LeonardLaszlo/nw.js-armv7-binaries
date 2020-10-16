@@ -29,7 +29,6 @@ function getDepotTools {
 }
 
 function configureGclientForNwjs {
-  mkdir -p "$NWJSDIR" && cd "$NWJSDIR"
   cat <<CONFIG > ".gclient"
 solutions = [
   { "name"        : 'src',
@@ -59,7 +58,7 @@ function getGitRepository {
 }
 
 function getNwjsRepository {
-  mkdir $NWJSDIR/src && cd $NWJSDIR/src
+  cd $NWJSDIR
   gclient sync --with_branch_heads --nohooks
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
   $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
@@ -72,5 +71,6 @@ function getNwjsRepository {
 
 getNecessaryUbuntuPackages
 getDepotTools
+mkdir -p "$NWJSDIR" && cd "$NWJSDIR"
 configureGclientForNwjs
 getNwjsRepository
