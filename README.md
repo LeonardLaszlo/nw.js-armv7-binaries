@@ -1,12 +1,13 @@
 # NW.js ARMv7 binaries
 
-This repository is meant to host the executable NW.js ARMv7 binaries under the [Releases][1] tab. As a curtesy it also provides the documentation to reproduce these builds (for newer versions under the form of shell scripts). See the [docs][2] directory.
+Hey, thanks for reading me. The NW.js ARMv7 binaries are located under the [Releases][1] tab.
+The documentation of these builds is available in the root directory for the latest version and the [docs][2] directory for older versions.
 
-Please note the releases are not necessarily done chronologically. They are done on a best effort basis. Thank you for your understanding!
+Note: the releases are not done chronologically. The newer versions contain all flavors of NW.js in the archive.
 
 ### Instructions for running your NW.js application on Linux ARMv7
 
-After downloading the binary archive and unpacking it you can run NW.js on Linux ARMv7 devices with the following command:
+After downloading the binary archive and unpacking it, NW.js can be executed on Linux ARMv7 devices with the following command:
 
 `./nw --use-gl=egl --ignore-gpu-blacklist --disable-accelerated-2d-canvas --num-raster-threads=2`
 
@@ -14,16 +15,16 @@ After downloading the binary archive and unpacking it you can run NW.js on Linux
 
 Building NW.js requires a bunch of resources.
 The build was done with a new installation of Docker.
-Use as many CPU cores as possible and at least 10 GB of RAM, 4GB swap and 110 GB of disk.
+To reproduce it, use as many CPU cores as possible and at least 10 GB of RAM, 4GB swap and 110 GB of disk.
 
 ``` Bash
-docker image build -t laslaul/nwjs-arm-build-env:v0.45.x .
+docker image build -t laslaul/nwjs-arm-build-env .
 ```
 
 Start the environment:
 
 ``` Bash
-docker run -it laslaul/nwjs-arm-build-env:v0.45.x
+docker run -it laslaul/nwjs-arm-build-env
 ```
 
 Thanks **@gripped**, **@jtg-gg** and **@llamasoft**!
