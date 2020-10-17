@@ -10,6 +10,9 @@ export PATH=${PATH}:${DEPOT_TOOLS_DIRECTORY}
 
 export DEPOT_TOOLS_REPO="https://chromium.googlesource.com/chromium/tools/depot_tools.git"
 
+export RED='\033[0;31m'
+export NC='\033[0m' # No Color
+
 function getNecessaryUbuntuPackages {
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
@@ -29,6 +32,7 @@ function getDepotTools {
 }
 
 function configureGclientForNwjs {
+  cd "$NWJSDIR"
   cat <<CONFIG > ".gclient"
 solutions = [
   { "name"        : 'src',
@@ -51,8 +55,9 @@ CONFIG
 }
 
 function getGitRepository {
-  REPO_URL="$1"
-  REPO_DIR="$2"
+  NWJS_BRANCH="$1"
+  REPO_URL="$2"
+  REPO_DIR="$3"
   mkdir -p "$REPO_DIR"
   git clone --depth 1 --branch "${NWJS_BRANCH}" "$REPO_URL" "$REPO_DIR"
 }
@@ -61,16 +66,18 @@ function getNwjsRepository {
   cd $NWJSDIR
   gclient sync --with_branch_heads --nohooks
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
-  $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
-  $NWJSDIR/src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
-  getGitRepository "https://github.com/nwjs/nw.js" "$NWJSDIR/src/content/nw"
-  getGitRepository "https://github.com/nwjs/node" "$NWJSDIR/src/third_party/node-nw"
-  getGitRepository "https://github.com/nwjs/v8" "$NWJSDIR/src/v8"
+  $NWJSDIR/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
+  $NWJSDIR/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
   gclient runhooks
 }
 
+echo -e "${RED}Building container for branch: $NWJS_BRANCH${NC}"
+[ -z "$NWJS_BRANCH" ] && exit 1
 getNecessaryUbuntuPackages
 getDepotTools
-mkdir -p "$NWJSDIR" && cd "$NWJSDIR"
+mkdir -p "$NWJSDIR"
 configureGclientForNwjs
+getGitRepository "${NWJS_BRANCH}" "https://github.com/nwjs/nw.js" "$NWJSDIR/src/content/nw"
+getGitRepository "${NWJS_BRANCH}" "https://github.com/nwjs/node" "$NWJSDIR/src/third_party/node-nw"
+getGitRepository "${NWJS_BRANCH}" "https://github.com/nwjs/v8" "$NWJSDIR/src/v8"
 getNwjsRepository
