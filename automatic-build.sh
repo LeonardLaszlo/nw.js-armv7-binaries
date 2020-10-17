@@ -2,7 +2,7 @@
 
 set -e
 
-# TODO install curl, python, docker if needed.
+echo "TODO install curl, python, docker if needed"
 
 PARAMS=""
 
@@ -12,8 +12,8 @@ while (( "$#" )); do
       SILENT="true"
       shift
       ;;
-    -u|--upload-container)
-      UPLOAD_CONTAINER="true"
+    -u|--upload-image)
+      UPLOAD_IMAGE="true"
       shift
       ;;
     -c|--clean-docker)
@@ -38,6 +38,15 @@ while (( "$#" )); do
         exit 1
       fi
       ;;
+    -r|--docker-repository)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        DOCKER_REPOSITORY="$2"
+        shift 2
+      else
+        echo "Error: Argument for $1 is missing" >&2
+        exit 1
+      fi
+      ;;
     -*|--*=) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
       exit 1
@@ -49,74 +58,85 @@ while (( "$#" )); do
   esac
 done
 
-# Set positional arguments in their proper place.
+[ -z "$SILENT" ] && echo "Set positional arguments in their proper place"
 eval set -- "$PARAMS"
+[ -z "$SILENT" ] && echo "Done reading parameters"
 
-# Done reading parameters.
-# Assign default values for missing parameters.
+function createContainerAndCheckoutBranchIfNeeded {
+  [ -z "$SILENT" ] && echo "Start a container from the $DOCKER_REPOSITORY image"
+  CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
+  [ -z "$SILENT" ] && echo "Read the checked out branch, from inside of the container"
+  CURRENT_BRANCH="$( docker "$DOCKER_PARAMS" exec -t "$CONTAINER_ID" bash -c 'cd /usr/docker/nwjs/src && git show-branch | cut -d "[" -f2 | cut -d "]" -f1' )"
+  [ -z "$SILENT" ] && echo "Needed to match regex because equality checks fails here. Weird enough to waste some hours on this"
+  if [[ ! "$CURRENT_BRANCH" =~ "$NWJS_BRANCH" ]]; then
+    [ -z "$SILENT" ] && echo "Checking out $NWJS_BRANCH branch"
+    docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
+    [ -n "$UPLOAD_IMAGE"] && [ -z "$SILENT" ] && echo "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
+    [ -n "$UPLOAD_IMAGE"] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+    [ -n "$UPLOAD_IMAGE"] && [ -z "$SILENT" ] && echo "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
+    [ -n "$UPLOAD_IMAGE"] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+  fi
+}
 
-# Get the active branch from the official repo, if it the branch was not provided by the user.
-[ -z "$NWJS_BRANCH" ] &&
-NWJS_BRANCH=$(curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])')
-[ -z "$DOCKER_CONTAINER" ] &&
-DOCKER_CONTAINER="laslaul/nwjs-arm-build-env"
+function buildImageAndStartContainer {
+  [ -z "$SILENT" ] && echo "Start building $DOCKER_REPOSITORY image"
+  docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$DOCKER_REPOSITORY":"$NWJS_BRANCH" .
+  [ -n "$UPLOAD_IMAGE"] && [ -z "$SILENT" ] && echo "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
+  [ -n "$UPLOAD_IMAGE"] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+  [ -z "$SILENT" ] && echo "Start a container from the $DOCKER_REPOSITORY image"
+  CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
+}
+
+[ -z "$SILENT" ] && echo "Assign default values for missing parameters"
+[ -z "$NWJS_BRANCH" ] && echo "Get the active branch from the official repo, if it the branch was not provided by the user" &&
+NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
+[ -z "$SILENT" ] && echo "NW.js active branch: $NWJS_BRANCH"
+
+[ -z "$DOCKER_REPOSITORY" ] &&
+DOCKER_REPOSITORY="laslaul/nwjs-arm-build-env"
+[ -z "$SILENT" ] && echo "Docker repository: $DOCKER_REPOSITORY"
+
 [ -z "$DOCKER_HOST" ] &&
 DOCKER_PARAMS="-H unix:///var/run/docker.sock" || DOCKER_PARAMS="-H $DOCKER_HOST"
+[ -z "$SILENT" ] && echo "Docker parameters: $DOCKER_PARAMS"
 
-[ -z "$SILENT" ] && echo "NW.js active branch: $NWJS_BRANCH."
-[ -z "$SILENT" ] && echo "Docker container label: $DOCKER_CONTAINER."
-[ -z "$SILENT" ] && echo "Docker parameters: $DOCKER_PARAMS."
-
-# Print the disk usage of docker.
-[ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
-
-# Check whether the container already exists on the docker host.
-CONTAINER_ID=$(docker "$DOCKER_PARAMS" ps --all --quiet --filter "ancestor=$DOCKER_CONTAINER")
-if [ -z "$CONTAINER_ID" ]
+[ -z "$SILENT" ] && echo "Check whether the image exists on the docker host"
+IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
+if [ -z "$IMAGE_ID" ]
 then
-  # If the container does not exist on the docker host.
-  [ -z "$SILENT" ] && echo "Did not find container: $DOCKER_CONTAINER."
-  [ -z "$SILENT" ] && echo "Pulling: $DOCKER_CONTAINER."
-  docker "$DOCKER_PARAMS" pull "$DOCKER_CONTAINER" && (
-    # If the container exists on docker hub, pull the container and checkout the desired branch.
-    [ -z "$SILENT" ] && echo "Found container $DOCKER_CONTAINER on dockerhub"
-    docker "$DOCKER_PARAMS" start "$CONTAINER_ID";
-    [ -z "$SILENT" ] && echo "Checking out "$NWJS_BRANCH"."
-    docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
-    [ -z "$UPLOAD_CONTAINER"] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_CONTAINER":"$NWJS_BRANCH"
-    [ -z "$UPLOAD_CONTAINER"] && docker "$DOCKER_PARAMS" push "$DOCKER_CONTAINER":"$NWJS_BRANCH"
+  [ -z "$SILENT" ] && echo "The $DOCKER_REPOSITORY image does not exist on the docker host";
+  [ -z "$SILENT" ] && echo "Pulling: $DOCKER_REPOSITORY";
+  docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY" && (
+    [ -z "$SILENT" ] && echo "Found image of $DOCKER_REPOSITORY on dockerhub";
+    createContainerAndCheckoutBranchIfNeeded;
   ) || (
-    # If the container is not found on docker hub, build it.
-    [ -z "$SILENT" ] && echo "Didn't find container $DOCKER_CONTAINER on dockerhub. Building active branch: $NWJS_BRANCH."
-    docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$DOCKER_CONTAINER":"$NWJS_BRANCH" .
-    [ -z "$UPLOAD_CONTAINER"] && docker "$DOCKER_PARAMS" push "$DOCKER_CONTAINER":"$NWJS_BRANCH"
-    docker "$DOCKER_PARAMS" run "$DOCKER_CONTAINER"
+    [ -z "$SILENT" ] && echo "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH";
+    buildImageAndStartContainer;
   )
-  CONTAINER_ID=$(docker "$DOCKER_PARAMS" ps --all --quiet --filter "ancestor=$DOCKER_CONTAINER")
 else
-  # If the container exists on the docker host.
-  [ -z "$SILENT" ] && echo "Found container with id: $CONTAINER_ID locally."
-  docker "$DOCKER_PARAMS" start "$CONTAINER_ID"
-  [ -z "$SILENT" ] && echo "Checking out "$NWJS_BRANCH"."
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
-  [ -z "$UPLOAD_CONTAINER"] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_CONTAINER":"$NWJS_BRANCH"
-  [ -z "$UPLOAD_CONTAINER"] && docker "$DOCKER_PARAMS" push "$DOCKER_CONTAINER":"$NWJS_BRANCH"
+  IMAGE_ID="${IMAGE_ID[0]}";
+  [ -z "$SILENT" ] && echo "Found image with id: $IMAGE_ID locally";
+  createContainerAndCheckoutBranchIfNeeded;
 fi
 
-# At this point we should have the building environment up an running.
-[ -z "$SILENT" ] && echo "Started successfully container with id: $CONTAINER_ID."
+[ -z "$SILENT" ] && echo "Container created successfully. Id: $CONTAINER_ID"
 
-# Clean the unused docker objects.
-[ -z "$CLEAN_DOCKER" ] && docker "$DOCKER_PARAMS" system prune --force
+# Print the disk usage of docker.
+# [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
 
-# Start the building process.
-[ -z "$SILENT" ] && echo "Let's start building $CONTAINER_ID."
+[ -n "$CLEAN_DOCKER" ] && [ -z "$SILENT" ] && echo "Clean the unused docker objects"
+[ -n "$CLEAN_DOCKER" ] && docker "$DOCKER_PARAMS" system prune --force
+
+[ -z "$SILENT" ] && echo "Start building $NWJS_BRANCH"
 docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
 ARCHIVE_NAME="$NWJS_BRANCH"_$(date +"%Y-%m-%d_%T").tar.gz
+[ -z "$SILENT" ] && echo "Create $ARCHIVE_NAME archive"
 docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" tar -zcvf "$ARCHIVE_NAME" /usr/docker/dist/*
 mkdir -p binaries
+[ -z "$SILENT" ] && echo "Copy artifact $ARCHIVE_NAME from container to host"
 docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
-[ -z "$SILENT" ] && echo "Artifact $ARCHIVE_NAME created successfully."
+[ -z "$SILENT" ] && echo "Artifact $ARCHIVE_NAME copied successfully"
+[ -z "$SILENT" ] && echo "Stop container $CONTAINER_ID"
 docker "$DOCKER_PARAMS" stop "$CONTAINER_ID"
 
 # TODO remove the container if needed.
