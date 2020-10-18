@@ -71,6 +71,19 @@ log "Set positional arguments in their proper place"
 eval set -- "$PARAMS"
 log "Done reading parameters"
 
+log "Assign default values for missing parameters"
+[ -z "$NWJS_BRANCH" ] && echo "Get the active branch from the official repo, if it the branch was not provided by the user" &&
+NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
+log "NW.js active branch: $NWJS_BRANCH"
+
+[ -z "$DOCKER_REPOSITORY" ] &&
+DOCKER_REPOSITORY="laslaul/nwjs-arm-build-env"
+log "Docker repository: $DOCKER_REPOSITORY"
+
+[ -z "$DOCKER_HOST" ] &&
+DOCKER_PARAMS="-H unix:///var/run/docker.sock" || DOCKER_PARAMS="-H $DOCKER_HOST"
+log "Docker parameters: $DOCKER_PARAMS"
+
 function createContainerAndCheckoutBranchIfNeeded {
   log "Start a container from the $DOCKER_REPOSITORY image"
   CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
@@ -96,57 +109,57 @@ function buildImageAndStartContainer {
   CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
 }
 
-log "Assign default values for missing parameters"
-[ -z "$NWJS_BRANCH" ] && echo "Get the active branch from the official repo, if it the branch was not provided by the user" &&
-NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
-log "NW.js active branch: $NWJS_BRANCH"
-
-[ -z "$DOCKER_REPOSITORY" ] &&
-DOCKER_REPOSITORY="laslaul/nwjs-arm-build-env"
-log "Docker repository: $DOCKER_REPOSITORY"
-
-[ -z "$DOCKER_HOST" ] &&
-DOCKER_PARAMS="-H unix:///var/run/docker.sock" || DOCKER_PARAMS="-H $DOCKER_HOST"
-log "Docker parameters: $DOCKER_PARAMS"
-
-log "Check whether the image exists on the docker host"
-IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
-if [ -z "$IMAGE_ID" ]
-then
-  log "The $DOCKER_REPOSITORY image does not exist on the docker host";
-  log "Pulling: $DOCKER_REPOSITORY";
-  docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY" && (
-    log "Found image of $DOCKER_REPOSITORY on dockerhub";
+function startContainer {
+  log "Check whether the image exists on the docker host"
+  IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
+  if [ -z "$IMAGE_ID" ]
+  then
+    log "The $DOCKER_REPOSITORY image does not exist on the docker host";
+    log "Pulling: $DOCKER_REPOSITORY";
+    docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY" && (
+      log "Found image of $DOCKER_REPOSITORY on dockerhub";
+      createContainerAndCheckoutBranchIfNeeded;
+    ) || (
+      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH";
+      buildImageAndStartContainer;
+    )
+  else
+    IMAGE_ID="${IMAGE_ID[0]}";
+    log "Found image with id: $IMAGE_ID locally";
     createContainerAndCheckoutBranchIfNeeded;
-  ) || (
-    log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH";
-    buildImageAndStartContainer;
-  )
-else
-  IMAGE_ID="${IMAGE_ID[0]}";
-  log "Found image with id: $IMAGE_ID locally";
-  createContainerAndCheckoutBranchIfNeeded;
-fi
+  fi
 
-log "Container created successfully. Id: $CONTAINER_ID"
+  log "Container created successfully. Id: $CONTAINER_ID"
+}
 
-# Print the disk usage of docker.
-# [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+function buildNwjs {
+  log "Start building $NWJS_BRANCH"
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
+  ARCHIVE_NAME="$NWJS_BRANCH"_$(date +"%Y-%m-%d_%T").tar.gz
+  log "Create $ARCHIVE_NAME archive"
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" tar -zcvf "$ARCHIVE_NAME" /usr/docker/dist/*
+  mkdir -p binaries
+  log "Copy artifact $ARCHIVE_NAME from container to host"
+  docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
+  log "Artifact $ARCHIVE_NAME copied successfully"
+}
 
-[ -n "$CLEAN_DOCKER" ] && log "Clean the unused docker objects"
-[ -n "$CLEAN_DOCKER" ] && docker "$DOCKER_PARAMS" system prune --force
+function cleanDocker {
+  # Print the disk usage of docker.
+  # [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+  [ -n "$CLEAN_DOCKER" ] && log "Clean the unused docker objects"
+  [ -n "$CLEAN_DOCKER" ] && docker "$DOCKER_PARAMS" system prune --force
+}
 
-log "Start building $NWJS_BRANCH"
-docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
-ARCHIVE_NAME="$NWJS_BRANCH"_$(date +"%Y-%m-%d_%T").tar.gz
-log "Create $ARCHIVE_NAME archive"
-docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" tar -zcvf "$ARCHIVE_NAME" /usr/docker/dist/*
-mkdir -p binaries
-log "Copy artifact $ARCHIVE_NAME from container to host"
-docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
-log "Artifact $ARCHIVE_NAME copied successfully"
-log "Stop container $CONTAINER_ID"
-docker "$DOCKER_PARAMS" stop "$CONTAINER_ID"
+function stopContainer {
+  log "Stop container $CONTAINER_ID"
+  docker "$DOCKER_PARAMS" stop "$CONTAINER_ID"
+}
+
+startContainer
+cleanDocker
+buildNwjs
+stopContainer
 
 # TODO remove the container if needed.
 # TODO upload to github releases.
