@@ -95,7 +95,8 @@ function createContainerAndCheckoutBranchIfNeeded {
   log "Needed to match regex because equality checks fails here. Weird enough to waste some hours on this"
   if [[ ! "$CURRENT_BRANCH" =~ "$NWJS_BRANCH" ]]; then
     log "Checking out $NWJS_BRANCH branch"
-    docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
+    docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
+      /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
     [ -n "$UPLOAD_IMAGE"] && log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
     [ -n "$UPLOAD_IMAGE"] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
     [ -n "$UPLOAD_IMAGE"] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
@@ -140,7 +141,8 @@ function buildNwjs {
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
   ARCHIVE_NAME='${NWJS_BRANCH}_$(date +"%Y-%m-%d).tar.gz'
   log "Create $ARCHIVE_NAME archive"
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" sh -c "tar --force-local -zcvf ${ARCHIVE_NAME} /usr/docker/dist/*"
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
+    sh -c "tar --force-local -zcvf ${ARCHIVE_NAME} /usr/docker/dist/*"
   mkdir -p binaries
   log "Copy artifact $ARCHIVE_NAME from container to host"
   docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
