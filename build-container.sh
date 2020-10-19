@@ -66,8 +66,8 @@ function getNwjsRepository {
   cd $NWJSDIR
   gclient sync --with_branch_heads --nohooks
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
-  $NWJSDIR/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
-  $NWJSDIR/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
+  $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
+  $NWJSDIR/src/build/linux/sysroot_scripts/install-sysroot.py --arch=arm
   gclient runhooks
 }
 
