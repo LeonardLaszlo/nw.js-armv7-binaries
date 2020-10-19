@@ -5,6 +5,9 @@ set -e
 export RED='\033[0;31m'
 export CYAN="\033[0;36m"
 export NC='\033[0m' # No Color
+export GITHUB_REPO="LeonardLaszlo/nw.js-armv7-binaries"
+export DOCKER_REPOSITORY="laslaul/nwjs-arm-build-env"
+export DOCKER_PARAMS="-H unix:///var/run/docker.sock"
 
 function log {
   [ -z "$SILENT" ] && echo -e "${CYAN}$1${NC}"
@@ -15,7 +18,8 @@ function error {
   exit 1
 }
 
-echo "TODO install curl, python, docker if needed"
+log "TODO install curl, python, docker if needed"
+log "Start parsing parameters"
 
 PARAMS=""
 
@@ -69,26 +73,25 @@ done
 
 log "Set positional arguments in their proper place"
 eval set -- "$PARAMS"
-log "Done reading parameters"
+log "Done parsing parameters"
 
-log "Assign default values for missing parameters"
-[ -z "$NWJS_BRANCH" ] && echo "Get the active branch from the official repo, if it the branch was not provided by the user" &&
-NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
+[ -z "$NWJS_BRANCH" ] && echo "Get the active branch from the official repo" &&
+NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js \
+  | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
 log "NW.js active branch: $NWJS_BRANCH"
 
-[ -z "$DOCKER_REPOSITORY" ] &&
-DOCKER_REPOSITORY="laslaul/nwjs-arm-build-env"
 log "Docker repository: $DOCKER_REPOSITORY"
 
-[ -z "$DOCKER_HOST" ] &&
-DOCKER_PARAMS="-H unix:///var/run/docker.sock" || DOCKER_PARAMS="-H $DOCKER_HOST"
+[ -n "$DOCKER_HOST" ] && DOCKER_PARAMS="-H $DOCKER_HOST"
 log "Docker parameters: $DOCKER_PARAMS"
 
 function createContainerAndCheckoutBranchIfNeeded {
   log "Start a container from the $DOCKER_REPOSITORY image"
   CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
   log "Read the checked out branch, from inside of the container"
-  CURRENT_BRANCH="$( docker "$DOCKER_PARAMS" exec -t "$CONTAINER_ID" bash -c 'cd /usr/docker/nwjs/src && git show-branch | cut -d "[" -f2 | cut -d "]" -f1' )"
+  CURRENT_BRANCH="$( docker "$DOCKER_PARAMS" exec -t "$CONTAINER_ID" \
+    bash -c 'cd /usr/docker/nwjs/src && git show-branch | cut -d "[" -f2 | cut -d "]" -f1' | tr -d '[:space:]' )"
+  log "Checked out branch in the container is --$CURRENT_BRANCH-- and the desired branch is --$NWJS_BRANCH--"
   log "Needed to match regex because equality checks fails here. Weird enough to waste some hours on this"
   if [[ ! "$CURRENT_BRANCH" =~ "$NWJS_BRANCH" ]]; then
     log "Checking out $NWJS_BRANCH branch"
@@ -135,9 +138,9 @@ function startContainer {
 function buildNwjs {
   log "Start building $NWJS_BRANCH"
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
-  ARCHIVE_NAME="$NWJS_BRANCH"_$(date +"%Y-%m-%d_%T").tar.gz
+  ARCHIVE_NAME='${NWJS_BRANCH}_$(date +"%Y-%m-%d).tar.gz'
   log "Create $ARCHIVE_NAME archive"
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" tar -zcvf "$ARCHIVE_NAME" /usr/docker/dist/*
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" sh -c "tar --force-local -zcvf ${ARCHIVE_NAME} /usr/docker/dist/*"
   mkdir -p binaries
   log "Copy artifact $ARCHIVE_NAME from container to host"
   docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
@@ -145,10 +148,12 @@ function buildNwjs {
 }
 
 function cleanDocker {
-  # Print the disk usage of docker.
-  # [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
-  [ -n "$CLEAN_DOCKER" ] && log "Clean the unused docker objects"
-  [ -n "$CLEAN_DOCKER" ] && docker "$DOCKER_PARAMS" system prune --force
+  if [ -n "$CLEAN_DOCKER" ]; then
+    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+    log "Clean the unused docker objects"
+    docker "$DOCKER_PARAMS" system prune --force
+    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+  fi
 }
 
 function stopContainer {
@@ -156,10 +161,29 @@ function stopContainer {
   docker "$DOCKER_PARAMS" stop "$CONTAINER_ID"
 }
 
+function releaseOnGithub {
+  FILE=$(basename -- "$1")
+  FILE_NAME=${FILE%%.*}
+  ACCESS_TOKEN=$(cat .github-token)
+  if [ -n "$ACCESS_TOKEN" ]; then
+    RELEASE_JSON="{\"tag_name\": \"$FILE_NAME\",\"name\": \"$FILE_NAME\"}"
+    log "Create release $FILE_NAME"
+    CREATE_RELEASE_RESULT=$(curl -s -H "Authorization: token $ACCESS_TOKEN" --data "$RELEASE_JSON" \
+      $"https://api.github.com/repos/$GITHUB_REPO/releases")
+    log "$CREATE_RELEASE_RESULT"
+    RELEASE_ID="$( echo $CREATE_RELEASE_RESULT | python -c "import sys, json; print json.load(sys.stdin)['id']")"
+    log "Uploading artifact $FILE"
+    UPLOAD_ARTIFACT_RESULT=$(curl -s -H "Authorization: token $ACCESS_TOKEN" \
+      -H "Content-Type: $(file -b --mime-type binaries/$FILE)" \
+      --data-binary @binaries/$FILE \
+      "https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE")
+    log "$UPLOAD_ARTIFACT_RESULT"
+  fi
+}
+
 startContainer
 cleanDocker
 buildNwjs
 stopContainer
-
-# TODO remove the container if needed.
-# TODO upload to github releases.
+[ -n "$ARCHIVE_NAME" ] && releaseOnGithub "$ARCHIVE_NAME"
+cleanDocker

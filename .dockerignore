@@ -4,5 +4,6 @@
 .DS_Store
 *.tar.gz
 .archive/
+.github-token
 binaries/
 README.MD
