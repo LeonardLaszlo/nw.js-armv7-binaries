@@ -97,18 +97,18 @@ function createContainerAndCheckoutBranchIfNeeded {
     log "Checking out $NWJS_BRANCH branch"
     docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
       /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
-    [ -n "$UPLOAD_IMAGE"] && log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
-    [ -n "$UPLOAD_IMAGE"] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
-    [ -n "$UPLOAD_IMAGE"] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
-    [ -n "$UPLOAD_IMAGE"] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+    [ -n "$UPLOAD_IMAGE" ] && log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
+    [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+    [ -n "$UPLOAD_IMAGE" ] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
+    [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
   fi
 }
 
 function buildImageAndStartContainer {
   log "Start building $DOCKER_REPOSITORY image"
   docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$DOCKER_REPOSITORY":"$NWJS_BRANCH" .
-  [ -n "$UPLOAD_IMAGE"] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
-  [ -n "$UPLOAD_IMAGE"] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+  [ -n "$UPLOAD_IMAGE" ] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
+  [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
   log "Start a container from the $DOCKER_REPOSITORY image"
   CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
 }
