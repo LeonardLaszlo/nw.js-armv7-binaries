@@ -104,7 +104,7 @@ function createContainerAndCheckoutBranchIfNeeded {
   startContainerFromImage
   log "Read the checked out branch, from inside of the container"
   CURRENT_BRANCH="$( docker "$DOCKER_PARAMS" exec --tty "$CONTAINER_ID" \
-    bash -c 'cd /usr/docker/nwjs/src && git show-branch | cut -d "[" -f2 | cut -d "]" -f1' | tr -d '[:space:]' )"
+    bash -c 'cd /usr/docker/nwjs/src/content/nw && git rev-parse --abbrev-ref HEAD' | tr -d '[:space:]' )"
   log "Checked out branch in the container is --$CURRENT_BRANCH-- and the desired branch is --$NWJS_BRANCH--"
   if [ "$CURRENT_BRANCH" != "$NWJS_BRANCH" ]; then
     log "Checking out $NWJS_BRANCH branch"
@@ -127,19 +127,18 @@ function startContainer {
   IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
   if [ -z "$IMAGE_ID" ]
   then
-    log "The $DOCKER_REPOSITORY image does not exist on the docker host"
-    log "Pulling: $DOCKER_REPOSITORY"
+    log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
     docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY" && (
-      log "Found image of $DOCKER_REPOSITORY on dockerhub"
-      createContainerAndCheckoutBranchIfNeeded
+      log "Found image of $DOCKER_REPOSITORY on dockerhub";
+      createContainerAndCheckoutBranchIfNeeded;
     ) || (
-      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
-      buildImageAndStartContainer
+      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH";
+      buildImageAndStartContainer;
     )
   else
     IMAGE_ID="${IMAGE_ID[0]}";
-    log "Found image with id: $IMAGE_ID locally"
-    createContainerAndCheckoutBranchIfNeeded
+    log "Found image with id: $IMAGE_ID locally";
+    createContainerAndCheckoutBranchIfNeeded;
   fi
   log "Container created successfully. Id: $CONTAINER_ID"
 }
