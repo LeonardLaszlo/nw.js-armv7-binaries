@@ -85,32 +85,41 @@ log "Docker repository: $DOCKER_REPOSITORY"
 [ -n "$DOCKER_HOST" ] && DOCKER_PARAMS="-H $DOCKER_HOST"
 log "Docker parameters: $DOCKER_PARAMS"
 
-function createContainerAndCheckoutBranchIfNeeded {
+function commitImageIfNeeded {
+  [ -n "$UPLOAD_IMAGE" ] && log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
+  [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+}
+
+function pushImageToDockerHubIfNeeded {
+  [ -n "$UPLOAD_IMAGE" ] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
+  [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+}
+
+function startContainerFromImage {
   log "Start a container from the $DOCKER_REPOSITORY image"
   CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
+}
+
+function createContainerAndCheckoutBranchIfNeeded {
+  startContainerFromImage
   log "Read the checked out branch, from inside of the container"
-  CURRENT_BRANCH="$( docker "$DOCKER_PARAMS" exec -t "$CONTAINER_ID" \
+  CURRENT_BRANCH="$( docker "$DOCKER_PARAMS" exec --tty "$CONTAINER_ID" \
     bash -c 'cd /usr/docker/nwjs/src && git show-branch | cut -d "[" -f2 | cut -d "]" -f1' | tr -d '[:space:]' )"
   log "Checked out branch in the container is --$CURRENT_BRANCH-- and the desired branch is --$NWJS_BRANCH--"
-  log "Needed to match regex because equality checks fails here. Weird enough to waste some hours on this"
-  if [[ ! "$CURRENT_BRANCH" =~ "$NWJS_BRANCH" ]]; then
+  if [ "$CURRENT_BRANCH" != "$NWJS_BRANCH" ]; then
     log "Checking out $NWJS_BRANCH branch"
     docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
       /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
-    [ -n "$UPLOAD_IMAGE" ] && log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
-    [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
-    [ -n "$UPLOAD_IMAGE" ] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
-    [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+    commitImageIfNeeded
+    pushImageToDockerHubIfNeeded
   fi
 }
 
 function buildImageAndStartContainer {
   log "Start building $DOCKER_REPOSITORY image"
   docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$DOCKER_REPOSITORY":"$NWJS_BRANCH" .
-  [ -n "$UPLOAD_IMAGE" ] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
-  [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
-  log "Start a container from the $DOCKER_REPOSITORY image"
-  CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
+  pushImageToDockerHubIfNeeded
+  startContainerFromImage
 }
 
 function startContainer {
@@ -118,21 +127,20 @@ function startContainer {
   IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
   if [ -z "$IMAGE_ID" ]
   then
-    log "The $DOCKER_REPOSITORY image does not exist on the docker host";
-    log "Pulling: $DOCKER_REPOSITORY";
+    log "The $DOCKER_REPOSITORY image does not exist on the docker host"
+    log "Pulling: $DOCKER_REPOSITORY"
     docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY" && (
-      log "Found image of $DOCKER_REPOSITORY on dockerhub";
-      createContainerAndCheckoutBranchIfNeeded;
+      log "Found image of $DOCKER_REPOSITORY on dockerhub"
+      createContainerAndCheckoutBranchIfNeeded
     ) || (
-      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH";
-      buildImageAndStartContainer;
+      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
+      buildImageAndStartContainer
     )
   else
     IMAGE_ID="${IMAGE_ID[0]}";
-    log "Found image with id: $IMAGE_ID locally";
-    createContainerAndCheckoutBranchIfNeeded;
+    log "Found image with id: $IMAGE_ID locally"
+    createContainerAndCheckoutBranchIfNeeded
   fi
-
   log "Container created successfully. Id: $CONTAINER_ID"
 }
 
