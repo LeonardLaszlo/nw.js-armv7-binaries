@@ -47,8 +47,8 @@ function getNwjsRepository {
   gclient runhooks
 }
 
-echo -e "${RED}Checkout branch: $NWJS_BRANCH${NC}"
 [ -z "$NWJS_BRANCH" ] && exit 1
+echo -e "${RED}Checkout branch: $NWJS_BRANCH${NC}"
 mkdir -p "$NWJSDIR"
 configureGclientForNwjs
 getGitRepository "https://github.com/nwjs/nw.js" "$NWJSDIR/src/content/nw"
