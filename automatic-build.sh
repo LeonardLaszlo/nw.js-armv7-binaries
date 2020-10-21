@@ -146,7 +146,7 @@ function startContainer {
 function buildNwjs {
   log "Start building $NWJS_BRANCH"
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
-  ARCHIVE_NAME='${NWJS_BRANCH}_$(date +"%Y-%m-%d).tar.gz'
+  ARCHIVE_NAME=${NWJS_BRANCH}_$(date +"%Y-%m-%d").tar.gz
   log "Create $ARCHIVE_NAME archive"
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
     sh -c "tar --force-local -zcvf ${ARCHIVE_NAME} /usr/docker/dist/*"
