@@ -75,7 +75,7 @@ log "Set positional arguments in their proper place"
 eval set -- "$PARAMS"
 log "Done parsing parameters"
 
-[ -z "$NWJS_BRANCH" ] && echo "Get the active branch from the official repo" &&
+[ -z "$NWJS_BRANCH" ] && log "Get the active branch from the official repo" &&
 NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js \
   | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
 log "NW.js active branch: $NWJS_BRANCH"
