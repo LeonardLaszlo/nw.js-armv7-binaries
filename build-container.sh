@@ -71,8 +71,8 @@ function getNwjsRepository {
   gclient runhooks
 }
 
-echo -e "${RED}Building container for branch: $NWJS_BRANCH${NC}"
 [ -z "$NWJS_BRANCH" ] && exit 1
+echo -e "${RED}Building container for branch: $NWJS_BRANCH${NC}"
 getNecessaryUbuntuPackages
 getDepotTools
 mkdir -p "$NWJSDIR"

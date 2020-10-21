@@ -10,11 +10,11 @@ export DOCKER_REPOSITORY="laslaul/nwjs-arm-build-env"
 export DOCKER_PARAMS="-H unix:///var/run/docker.sock"
 
 function log {
-  [ -z "$SILENT" ] && echo -e "${CYAN}$1${NC}"
+  [ -z "$SILENT" ] && echo -e "$(date +"%Y-%m-%d %H:%M:%S") ${CYAN}$1${NC}"
 }
 
 function error {
-  [ -z "$SILENT" ] && echo -e "${RED}$1${NC}" >&2
+  [ -z "$SILENT" ] && echo -e "$(date +"%Y-%m-%d %H:%M:%S") ${RED}$1${NC}" >&2
   exit 1
 }
 
@@ -86,13 +86,17 @@ log "Docker repository: $DOCKER_REPOSITORY"
 log "Docker parameters: $DOCKER_PARAMS"
 
 function commitImageIfNeeded {
-  [ -n "$UPLOAD_IMAGE" ] && log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
-  [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+  if [ -n "$UPLOAD_IMAGE" ]; then
+    log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
+    docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY:$NWJS_BRANCH"
+  fi
 }
 
 function pushImageToDockerHubIfNeeded {
-  [ -n "$UPLOAD_IMAGE" ] && log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
-  [ -n "$UPLOAD_IMAGE" ] && docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY":"$NWJS_BRANCH"
+  if [ -n "$UPLOAD_IMAGE" ]; then
+    log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
+    docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY:$NWJS_BRANCH"
+  fi
 }
 
 function startContainerFromImage {
@@ -108,8 +112,10 @@ function createContainerAndCheckoutBranchIfNeeded {
   log "Checked out branch in the container is --$CURRENT_BRANCH-- and the desired branch is --$NWJS_BRANCH--"
   if [ "$CURRENT_BRANCH" != "$NWJS_BRANCH" ]; then
     log "Checking out $NWJS_BRANCH branch"
+    docker "$DOCKER_PARAMS" cp checkout-another-branch.sh "$CONTAINER_ID":/usr/docker
     docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
       /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
+    log "Checked out $NWJS_BRANCH branch successfully"
     commitImageIfNeeded
     pushImageToDockerHubIfNeeded
   fi
@@ -128,17 +134,17 @@ function startContainer {
   if [ -z "$IMAGE_ID" ]
   then
     log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
-    docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY" && (
-      log "Found image of $DOCKER_REPOSITORY on dockerhub";
-      createContainerAndCheckoutBranchIfNeeded;
-    ) || (
-      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH";
-      buildImageAndStartContainer;
-    )
+    if docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY"; then
+      log "Found image of $DOCKER_REPOSITORY on dockerhub"
+      createContainerAndCheckoutBranchIfNeeded
+    else
+      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
+      buildImageAndStartContainer
+    fi
   else
-    IMAGE_ID="${IMAGE_ID[0]}";
-    log "Found image with id: $IMAGE_ID locally";
-    createContainerAndCheckoutBranchIfNeeded;
+    IMAGE_ID="${IMAGE_ID[0]}"
+    log "Found image with id: $IMAGE_ID locally"
+    createContainerAndCheckoutBranchIfNeeded
   fi
   log "Container created successfully. Id: $CONTAINER_ID"
 }
@@ -194,5 +200,7 @@ startContainer
 cleanDocker
 buildNwjs
 stopContainer
-[ -n "$ARCHIVE_NAME" ] && releaseOnGithub "$ARCHIVE_NAME"
+if [ -n "$ARCHIVE_NAME" ]; then
+  releaseOnGithub "$ARCHIVE_NAME"
+fi
 cleanDocker
