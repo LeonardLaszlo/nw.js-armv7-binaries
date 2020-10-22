@@ -29,6 +29,10 @@ while (( "$#" )); do
       SILENT="true"
       shift
       ;;
+    -i|--commit-image)
+      COMMIT_IMAGE="true"
+      shift
+      ;;
     -u|--upload-image)
       UPLOAD_IMAGE="true"
       shift
@@ -71,24 +75,29 @@ while (( "$#" )); do
   esac
 done
 
-log "Set positional arguments in their proper place"
+log "Set positional arguments in their place"
 eval set -- "$PARAMS"
 log "Done parsing parameters"
 
-[ -z "$NWJS_BRANCH" ] && log "Get the active branch from the official repo" &&
-NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js \
-  | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
+if [ -z "$NWJS_BRANCH" ]; then
+  log "Get the active branch from the official repo"
+  NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js \
+    | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
+fi
+
+if [ -n "$DOCKER_HOST" ]; then
+  DOCKER_PARAMS="-H $DOCKER_HOST"
+fi
+
 log "NW.js active branch: $NWJS_BRANCH"
-
 log "Docker repository: $DOCKER_REPOSITORY"
-
-[ -n "$DOCKER_HOST" ] && DOCKER_PARAMS="-H $DOCKER_HOST"
 log "Docker parameters: $DOCKER_PARAMS"
 
 function commitImageIfNeeded {
-  if [ -n "$UPLOAD_IMAGE" ]; then
+  if [ -n "$UPLOAD_IMAGE" ] || [ -n "$COMMIT_IMAGE" ]; then
     log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
     docker "$DOCKER_PARAMS" commit "$CONTAINER_ID" "$DOCKER_REPOSITORY:$NWJS_BRANCH"
+    log "Committed $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH successfully"
   fi
 }
 
@@ -96,12 +105,14 @@ function pushImageToDockerHubIfNeeded {
   if [ -n "$UPLOAD_IMAGE" ]; then
     log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
     docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY:$NWJS_BRANCH"
+    log "Pushed $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
   fi
 }
 
 function startContainerFromImage {
   log "Start a container from the $DOCKER_REPOSITORY image"
   CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
+  log "Container created successfully. Id: $CONTAINER_ID"
 }
 
 function createContainerAndCheckoutBranchIfNeeded {
@@ -124,6 +135,7 @@ function createContainerAndCheckoutBranchIfNeeded {
 function buildImageAndStartContainer {
   log "Start building $DOCKER_REPOSITORY image"
   docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$DOCKER_REPOSITORY":"$NWJS_BRANCH" .
+  log "Building "$DOCKER_REPOSITORY":"$NWJS_BRANCH" was successful"
   pushImageToDockerHubIfNeeded
   startContainerFromImage
 }
@@ -146,12 +158,21 @@ function startContainer {
     log "Found image with id: $IMAGE_ID locally"
     createContainerAndCheckoutBranchIfNeeded
   fi
-  log "Container created successfully. Id: $CONTAINER_ID"
+}
+
+function cleanDocker {
+  if [ -n "$CLEAN_DOCKER" ]; then
+    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+    log "Clean the unused docker objects"
+    docker "$DOCKER_PARAMS" rm $(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")
+    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+  fi
 }
 
 function buildNwjs {
   log "Start building $NWJS_BRANCH"
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
+  log "Building $NWJS_BRANCH was successful"
   ARCHIVE_NAME=${NWJS_BRANCH}_$(date +"%Y-%m-%d").tar.gz
   log "Create $ARCHIVE_NAME archive"
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
@@ -160,15 +181,6 @@ function buildNwjs {
   log "Copy artifact $ARCHIVE_NAME from container to host"
   docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
   log "Artifact $ARCHIVE_NAME copied successfully"
-}
-
-function cleanDocker {
-  if [ -n "$CLEAN_DOCKER" ]; then
-    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
-    log "Clean the unused docker objects"
-    docker "$DOCKER_PARAMS" system prune --force
-    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
-  fi
 }
 
 function stopContainer {
