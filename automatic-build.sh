@@ -111,7 +111,7 @@ function pushImageToDockerHubIfNeeded {
 
 function startContainerFromImage {
   log "Start a container from the $DOCKER_REPOSITORY image"
-  CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY" )
+  CONTAINER_ID=$( docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY":"$NWJS_BRANCH" )
   log "Container created successfully. Id: $CONTAINER_ID"
 }
 
@@ -127,6 +127,13 @@ function createContainerAndCheckoutBranchIfNeeded {
     docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
       /usr/docker/checkout-another-branch.sh "$NWJS_BRANCH"
     log "Checked out $NWJS_BRANCH branch successfully"
+    commitImageIfNeeded
+    pushImageToDockerHubIfNeeded
+  else
+    log "Updating branch"
+    docker "$DOCKER_PARAMS" cp update-nwjs.sh "$CONTAINER_ID":/usr/docker
+    docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/update-nwjs.sh "$NWJS_BRANCH"
+    log "Finished updating branch"
     commitImageIfNeeded
     pushImageToDockerHubIfNeeded
   fi
@@ -164,6 +171,7 @@ function cleanDocker {
   if [ -n "$CLEAN_DOCKER" ]; then
     [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
     log "Clean the unused docker objects"
+    docker "$DOCKER_PARAMS" stop $(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")
     docker "$DOCKER_PARAMS" rm $(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")
     [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
   fi
