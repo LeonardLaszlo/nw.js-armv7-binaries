@@ -153,12 +153,12 @@ function buildImageAndStartContainer {
 }
 
 function startContainer {
-  log "Check whether the image exists on the docker host"
-  IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
   if [ -n "$FORCE_BUILD" ]; then
     log "Force build was set. Building branch: $NWJS_BRANCH"
     buildImageAndStartContainer
   else
+    log "Check whether the image exists on the docker host"
+    IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
     if [ -n "$IMAGE_ID" ]; then
       IMAGE_ID="${IMAGE_ID[0]}"
       log "Found image with id: $IMAGE_ID locally"
