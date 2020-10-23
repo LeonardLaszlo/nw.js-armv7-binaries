@@ -33,6 +33,10 @@ while (( "$#" )); do
       COMMIT_IMAGE="true"
       shift
       ;;
+    -f|--force-build)
+      FORCE_BUILD="true"
+      shift
+      ;;
     -u|--upload-image)
       UPLOAD_IMAGE="true"
       shift
@@ -151,20 +155,24 @@ function buildImageAndStartContainer {
 function startContainer {
   log "Check whether the image exists on the docker host"
   IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
-  if [ -z "$IMAGE_ID" ]
-  then
-    log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
-    if docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY"; then
-      log "Found image of $DOCKER_REPOSITORY on dockerhub"
+  if [ -n "$FORCE_BUILD" ]; then
+    log "Force build was set. Building branch: $NWJS_BRANCH"
+    buildImageAndStartContainer
+  else
+    if [ -n "$IMAGE_ID" ]; then
+      IMAGE_ID="${IMAGE_ID[0]}"
+      log "Found image with id: $IMAGE_ID locally"
       createContainerAndCheckoutBranchIfNeeded
     else
-      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
-      buildImageAndStartContainer
+      log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
+      if docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY"; then
+        log "Found image of $DOCKER_REPOSITORY on dockerhub"
+        createContainerAndCheckoutBranchIfNeeded
+      else
+        log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
+        buildImageAndStartContainer
+      fi
     fi
-  else
-    IMAGE_ID="${IMAGE_ID[0]}"
-    log "Found image with id: $IMAGE_ID locally"
-    createContainerAndCheckoutBranchIfNeeded
   fi
 }
 
