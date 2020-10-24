@@ -164,7 +164,9 @@ function startContainer {
     while IFS="" read -r line; do IMAGE_IDS+=("$line"); done < \
       <(docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY")
     if [ "${#IMAGE_IDS[@]}" -gt 0 ]; then
-      IMAGE_ID="${IMAGE_ID[0]}"
+      # IMAGE_ID is basically used for the following log only
+      # The actual image to be used will be either the one marked with the branch name as tag or the "latest" tag.
+      IMAGE_ID="${IMAGE_IDS[0]}"
       log "Found image with id: $IMAGE_ID locally"
       createContainerAndCheckoutBranchIfNeeded
     else
