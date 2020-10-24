@@ -17,4 +17,4 @@ jobs:
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}. ${{ secrets.MY_TOP_SECRET }}"
     - name: Run test script
-      run: echo "Hello ${{ github.event.inputs.name }}. ${{ secrets.MY_TOP_SECRET }}"
+      run: ./test.sh
