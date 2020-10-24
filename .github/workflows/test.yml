@@ -17,10 +17,10 @@ jobs:
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}. ${{ secrets.MY_TOP_SECRET }}"
     - name: List current directory
-      run: ls -la .
+      run: pwd && ls -la .
     - name: List parent directory
-      run: ls -la ..
+      run: pwd && ls -la ..
     - name: List grand parent directory
-      run: ls -la ../..
+      run: pwd && ls -la ../..
     - name: Run test script
       run: ./test.sh
