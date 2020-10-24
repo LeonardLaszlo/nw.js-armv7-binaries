@@ -1,6 +1,6 @@
 # Building NW.js for Linux ARMv7
 
-### Environment setup
+## Environment setup
 
 First thing to do is to download [Xubuntu 16.04.1 LTS (Xenial Xerus)] and install it onto your favorite virtual machine. For this tutorial [VirtualBox] was chosen.
 
@@ -19,7 +19,7 @@ Next install Git and some monitoring tools if not installed:
 sudo apt-get install git htop sysstat
 ```
 
-### Prerequisites
+## Prerequisites
 
 Read [Building NW.js] tutorial before you go further.
 
@@ -35,7 +35,7 @@ Add depot_tools to the end of your PATH (you will probably want to put this in y
 export PATH=$PATH:/path/to/depot_tools
 ```
 
-###### Bootstrapping Configuration
+### Bootstrapping Configuration
 If you have never used Git before, you’ll need to set some global git configurations; substitute your name and email address in the following commands:
 ```bash
 git config --global user.name "John Doe"
@@ -46,7 +46,7 @@ git config --global core.filemode false
 git config --global color.ui true
 ```
 
-### Get the Code
+## Get the Code
 
 **Step 1.** Create a folder for holding NW.js source code, export it to `NWJS` environment variable, and run following command in the folder to generate `.gclient` file:
 
@@ -166,7 +166,7 @@ export GYP_CHROMIUM_NO_ACTION=0
 python build/gyp_chromium -Goutput_dir=out_gn_arm third_party/node/node.gyp
 ```
 
-### Build
+## Build
 
 Build NW.js and Node:
 ```bash

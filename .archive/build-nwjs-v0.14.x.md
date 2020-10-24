@@ -1,6 +1,6 @@
 # Building NW.js for ARMv7
 
-### Environment setup
+## Environment setup
 
 First thing to do is to download [Ubuntu 14.04.5 LTS (Trusty Tahr)] and install it onto your favorite virtual machine. For this tutorial [VirtualBox] was chosen.
 
@@ -19,7 +19,7 @@ Next install Git if not installed:
 sudo apt-get install git
 ```
 
-### Prerequisites
+## Prerequisites
 
 Read [Building NW.js] tutorial before you go further.
 Checkout and install the [depot_tools package]. This contains the custom tools necessary to checkout and build NW.js.
@@ -34,7 +34,7 @@ Add depot_tools to the end of your PATH (you will probably want to put this in y
 export PATH=$PATH:/path/to/depot_tools
 ```
 
-###### Bootstrapping Configuration
+### Bootstrapping Configuration
 If you have never used Git before, you’ll need to set some global git configurations; substitute your name and email address in the following commands:
 ```bash
 git config --global user.name "John Doe"
@@ -45,7 +45,7 @@ git config --global core.filemode false
 git config --global color.ui true
 ```
 
-### Get the Code
+## Get the Code
 
 **Step 1.** Create a folder for holding NW.js source code, like `$HOME/nwjs`, and run following command in the folder to generate `.gclient` file:
 
@@ -157,7 +157,7 @@ gclient runhooks
 cd $HOME/nwjs/src
 ```
 
-### Build
+## Build
 
 Start the compilation:
 ```bash
