@@ -46,7 +46,7 @@ while (( "$#" )); do
       shift
       ;;
     -b|--branch)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         NWJS_BRANCH="$2"
         shift 2
       else
@@ -54,7 +54,7 @@ while (( "$#" )); do
       fi
       ;;
     -h|--docker-host)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         DOCKER_HOST="$2"
         shift 2
       else
@@ -62,14 +62,14 @@ while (( "$#" )); do
       fi
       ;;
     -r|--docker-repository)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         DOCKER_REPOSITORY="$2"
         shift 2
       else
         error "Argument for $1 is missing"
       fi
       ;;
-    -*|--*=) # unsupported flags
+    --*=|-*) # unsupported flags
       error "Unsupported flag $1"
       ;;
     *) # preserve positional arguments
@@ -147,7 +147,7 @@ function createContainerAndCheckoutBranchIfNeeded {
 function buildImageAndStartContainer {
   log "Start building $DOCKER_REPOSITORY image"
   docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$DOCKER_REPOSITORY":"$NWJS_BRANCH" .
-  log "Building "$DOCKER_REPOSITORY":"$NWJS_BRANCH" was successful"
+  log "Building $DOCKER_REPOSITORY:$NWJS_BRANCH was successful"
   pushImageToDockerHubIfNeeded
   startContainerFromImage
 }
@@ -158,8 +158,10 @@ function startContainer {
     buildImageAndStartContainer
   else
     log "Check whether the image exists on the docker host"
-    IMAGE_ID=( $( docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY" ) )
-    if [ -n "$IMAGE_ID" ]; then
+    IMAGE_IDS=()
+    while IFS="" read -r line; do IMAGE_IDS+=("$line"); done < \
+      <(docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY")
+    if [ "${#IMAGE_IDS[@]}" -gt 0 ]; then
       IMAGE_ID="${IMAGE_ID[0]}"
       log "Found image with id: $IMAGE_ID locally"
       createContainerAndCheckoutBranchIfNeeded
@@ -180,8 +182,8 @@ function cleanDocker {
   if [ -n "$CLEAN_DOCKER" ]; then
     [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
     log "Clean the unused docker objects"
-    docker "$DOCKER_PARAMS" stop $(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")
-    docker "$DOCKER_PARAMS" rm $(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")
+    docker "$DOCKER_PARAMS" stop "$(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")"
+    docker "$DOCKER_PARAMS" rm "$(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")"
     [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
   fi
 }
@@ -215,11 +217,11 @@ function releaseOnGithub {
     CREATE_RELEASE_RESULT=$(curl -s -H "Authorization: token $ACCESS_TOKEN" --data "$RELEASE_JSON" \
       $"https://api.github.com/repos/$GITHUB_REPO/releases")
     log "$CREATE_RELEASE_RESULT"
-    RELEASE_ID="$( echo $CREATE_RELEASE_RESULT | python -c "import sys, json; print json.load(sys.stdin)['id']")"
+    RELEASE_ID="$( echo "$CREATE_RELEASE_RESULT" | python -c "import sys, json; print json.load(sys.stdin)['id']")"
     log "Uploading artifact $FILE"
     UPLOAD_ARTIFACT_RESULT=$(curl -s -H "Authorization: token $ACCESS_TOKEN" \
-      -H "Content-Type: $(file -b --mime-type binaries/$FILE)" \
-      --data-binary @binaries/$FILE \
+      -H "Content-Type: $(file -b --mime-type binaries/"$FILE")" \
+      --data-binary @binaries/"$FILE" \
       "https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE")
     log "$UPLOAD_ARTIFACT_RESULT"
   fi
