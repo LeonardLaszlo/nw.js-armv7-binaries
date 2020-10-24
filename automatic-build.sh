@@ -190,7 +190,8 @@ function cleanDocker {
 
 function buildNwjs {
   log "Start building $NWJS_BRANCH"
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh
+  docker "$DOCKER_PARAMS" cp build-nwjs.sh "$CONTAINER_ID":/usr/docker
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh "$NWJS_BRANCH"
   log "Building $NWJS_BRANCH was successful"
   ARCHIVE_NAME=${NWJS_BRANCH}_$(date +"%Y-%m-%d").tar.gz
   log "Create $ARCHIVE_NAME archive"
