@@ -2,6 +2,7 @@
 
 set -e
 
+export NWJS_BRANCH="$1"
 export WORKDIR="/usr/docker"
 export NWJSDIR=${WORKDIR}/nwjs
 export DEPOT_TOOLS_DIRECTORY=${WORKDIR}/depot_tools
@@ -32,6 +33,22 @@ function applyPatch {
    # The .grd contains references to generated files.
    source_is_generated = true
 PATCH
+
+  if [ "$NWJS_BRANCH" = "nw49" ]; then
+    patch -p0 --ignore-whitespace << 'PATCH'
+--- a/build/config/linux/atk/BUILD.gn
++++ b/build/config/linux/atk/BUILD.gn
+@@ -10,7 +10,7 @@ import("//build/config/ui.gni")
+ assert(!is_chromeos)
+
+ # These packages should _only_ be expected when building for a target.
+-assert(current_toolchain == default_toolchain)
++# assert(current_toolchain == default_toolchain)
+
+ if (use_atk) {
+   assert(use_glib, "use_atk=true requires that use_glib=true")
+PATCH
+fi
 }
 
 function build {
