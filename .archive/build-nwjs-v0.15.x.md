@@ -4,7 +4,7 @@
 
 First thing to do is to download [Ubuntu 14.04.5 LTS (Trusty Tahr)] and install it onto your favorite virtual machine. For this tutorial [VirtualBox] was chosen.
 
-The host computer needs to have at least 50GB empty disk space and 8GB RAM. The guest machine needs 6GB RAM, 4GB swap area and 46GB disk space.
+The host computer needs to have at least 50 GB empty disk space and 8 GB RAM. The guest machine needs 6 GB RAM, 4 GB swap area and 46 GB disk space.
 
 After the installation is completed and Ubuntu is up, in VirtualBox menu, click on Devices/Insert Guest Additions CD image. Next click on the CD icon in the Ubuntu menu bar, and run the auto-installer. When the installer is done, reboot the guest machine.
 
@@ -77,9 +77,9 @@ Generally if you are not interested in running Chromium tests, you don't have to
 
 | path | repo |
 |:---- |:---- |
-| src/content/nw | https://github.com/nwjs/nw.js |
-| src/third_party/node | https://github.com/nwjs/node |
-| src/v8 | https://github.com/nwjs/v8 |
+| src/content/nw | <https://github.com/nwjs/nw.js> |
+| src/third_party/node | <https://github.com/nwjs/node> |
+| src/v8 | <https://github.com/nwjs/v8> |
 
 
 ```bash

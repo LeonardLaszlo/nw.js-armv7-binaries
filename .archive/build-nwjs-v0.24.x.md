@@ -6,15 +6,15 @@ Download and install [Xubuntu 16.04.1 LTS (Xenial Xerus)] on [VirtualBox].
 
 Host requirements:
 
-  - 16GB RAM
-  - 60GB empty disk space (SSD or high-speed HDD)
-  - fast internet connection
+-16 GB RAM
+-60 GB empty disk space (SSD or high-speed HDD)
+-fast internet connection
 
 Guest requirements:
 
-  - 10GB RAM
-  - 10GB swap
-  - 50GB disk space.
+-10 GB RAM
+-10 GB swap
+-50 GB disk space.
 
 
 Update and upgrade the packages on the guest os by running:
@@ -86,9 +86,9 @@ Generally if you are not interested in running Chromium tests, you don't have to
 
 | path | repo |
 |:---- |:---- |
-| src/content/nw | https://github.com/nwjs/nw.js |
-| src/third_party/node | https://github.com/nwjs/node |
-| src/v8 | https://github.com/nwjs/v8 |
+| src/content/nw | <https://github.com/nwjs/nw.js> |
+| src/third_party/node | <https://github.com/nwjs/node> |
+| src/v8 | <https://github.com/nwjs/v8> |
 
 
 ```bash
