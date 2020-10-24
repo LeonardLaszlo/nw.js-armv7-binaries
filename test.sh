@@ -1,5 +1,5 @@
 #!/bin/bash
 
 date +"%Y-%m-%d %H:%M:%S"
-apt update
-apt install docker python curl
+sudo apt update
+sudo apt install docker python curl
