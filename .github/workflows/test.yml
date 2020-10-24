@@ -8,7 +8,7 @@ on:
         default: 'World'
         required: true
   schedule:
-  - cron: "*/5 * * * *"
+  - cron: "* * * * 6"
 
 jobs:
   greet:
@@ -18,13 +18,5 @@ jobs:
       uses: actions/checkout@v2
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}. ${{ secrets.MY_TOP_SECRET }}"
-    - name: List current directory
-      run: pwd && ls -la
-    - name: List parent directory
-      run: cd .. && pwd && ls -la
-    - name: List grand parent directory
-      run: cd .. && pwd && ls -la
-    - name: List grand grand parent directory
-      run: cd .. && pwd && ls -la
     - name: Run test script
       run: ./test.sh
