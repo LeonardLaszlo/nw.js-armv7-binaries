@@ -14,13 +14,17 @@ jobs:
   greet:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
     - name: Send greeting
       run: echo "Hello ${{ github.event.inputs.name }}. ${{ secrets.MY_TOP_SECRET }}"
     - name: List current directory
-      run: pwd && ls -la .
+      run: pwd && ls -la
     - name: List parent directory
-      run: pwd && ls -la ..
+      run: cd .. && pwd && ls -la
     - name: List grand parent directory
-      run: pwd && ls -la ../..
+      run: cd .. && pwd && ls -la
+    - name: List grand grand parent directory
+      run: cd .. && pwd && ls -la
     - name: Run test script
       run: ./test.sh
