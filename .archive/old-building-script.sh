@@ -73,19 +73,19 @@ function configureGit {
 function getOrUpdateDepotTools {
   if [ -d "$DEPOT_TOOLS_DIRECTORY" ]; then
     echo -e "${RED}Update depot tools${NC}"
-    cd $DEPOT_TOOLS_DIRECTORY
+    cd "$DEPOT_TOOLS_DIRECTORY"
     git pull
   else
     echo -e "${RED}Clone depot tools${NC}"
-    cd $HOME
+    cd "$HOME"
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
   fi
 }
 
 function createGclientConfig {
   echo -e "${RED}Create gclient config${NC}"
-  mkdir -p $NWJS
-  cd $NWJS
+  mkdir -p "$NWJS"
+  cd "$NWJS"
   gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/$NWJS_BRANCH
 }
 
@@ -107,9 +107,9 @@ function getOrUpdateGitRepository {
   REPO_URL=$1
   REPO_DIR=$2
   echo -e "${RED}Get or update $REPO_DIR${NC}"
-  if [ -d $REPO_DIR ]; then
+  if [ -d "$REPO_DIR" ]; then
     echo -e "${RED}Update $REPO_DIR${NC}"
-    cd $REPO_DIR
+    cd "$REPO_DIR"
     git fetch --tags --prune
     git reset --hard HEAD
     # git am --abort || true
@@ -119,38 +119,38 @@ function getOrUpdateGitRepository {
     git status
   else
     echo -e "${RED}Clone $REPO_DIR${NC}"
-    mkdir -p $REPO_DIR
-    git clone $REPO_URL $REPO_DIR
-    cd $REPO_DIR
-    git checkout $NWJS_BRANCH
+    mkdir -p "$REPO_DIR"
+    git clone "$REPO_URL" "$REPO_DIR"
+    cd "$REPO_DIR"
+    git checkout "$NWJS_BRANCH"
   fi
 }
 
 function updateNwjsRepository {
   echo -e "${RED}Update NWJS repository${NC}"
-  cd $NWJS/src
+  cd "$NWJS"/src
   gclient sync --reset --with_branch_heads --nohooks
-  cd $NWJS/src
+  cd "$NWJS"/src
   sudo sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
-  $NWJS/src/build/install-build-deps.sh --arm --no-prompt
+  "$NWJS"/src/build/install-build-deps.sh --arm --no-prompt
 }
 
 function getAndApplyPatches {
   echo -e "${RED}Get and apply patches from @jtg-gg${NC}"
-  cd $NWJS/src
-  for COMMIT in ${CHROMIUM_PATCHES[@]}; do
-    curl -s https://github.com/jtg-gg/chromium.src/commit/$COMMIT.patch | git am
+  cd "$NWJS"/src
+  for COMMIT in "${CHROMIUM_PATCHES[@]}"; do
+    curl -s https://github.com/jtg-gg/chromium.src/commit/"$COMMIT".patch | git am
   done
 
-  cd $NWJS/src/content/nw/
-  for COMMIT in ${NODE_WEBKIT_PATCHES[@]}; do
-    curl -s https://github.com/jtg-gg/node-webkit/commit/$COMMIT.patch | git am
+  cd "$NWJS"/src/content/nw/
+  for COMMIT in "${NODE_WEBKIT_PATCHES[@]}"; do
+    curl -s https://github.com/jtg-gg/node-webkit/commit/"$COMMIT".patch | git am
   done
 }
 
 function runHooks {
   echo -e "${RED}Run hooks${NC}"
-  cd $NWJS/src
+  cd "$NWJS"/src
   gclient runhooks
   gn gen out_gn_arm/nw --args="$GN_ARGS"
   export GYP_CHROMIUM_NO_ACTION=0
@@ -159,7 +159,7 @@ function runHooks {
 
 function build {
   echo -e "${RED}Build${NC}"
-  cd $NWJS/src
+  cd "$NWJS"/src
   ninja -C out_gn_arm/nw nwjs
   ninja -C out_gn_arm/nw v8_libplatform
   ninja -C out_gn_arm/Release node
@@ -186,4 +186,4 @@ function build {
 runHooks
 build
 
-mkdir -p $NWJS/$NWJS_BRANCH
+mkdir -p "$NWJS"/"$NWJS_BRANCH"

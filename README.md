@@ -2,7 +2,7 @@
 
 Hey, thanks for reading me. TLDR; The NW.js ARMv7 binaries are located under the [Releases][1] tab.
 
-### Instructions for running your NW.js application on Linux ARMv7
+## Instructions for running your NW.js application on Linux ARMv7
 
 After downloading the archive and unpacking it, the NW.js binary can be executed on Linux ARMv7 devices with the following command:
 
@@ -10,7 +10,7 @@ After downloading the archive and unpacking it, the NW.js binary can be executed
 
 Thanks **@gripped**, **@jtg-gg** and **@llamasoft** for their endless patience and continuous help!
 
-### Docker
+## Docker
 
 Thanks to Docker containerization, building NW.js for ARMv7 is now as easy as it gets.
 However the building process is resource intensive, so I suggest at least 10 GB of RAM,
@@ -20,18 +20,18 @@ However the building process is resource intensive, so I suggest at least 10 GB 
 ./automatic-build.sh
 ```
 
-### Further reading
+## Further reading
 
 The documentation of older builds is available under the [.archive][2] directory.
 Some older versions require extra tweaks in order to build successfully.
 
 Official building NW.js [guide][4]. [Chrome branding][6] (enable proprietary codecs).
 
-https://gist.github.com/llamasoft/33af03b73945a84d7624460d67b922ab
+<https://gist.github.com/llamasoft/33af03b73945a84d7624460d67b922ab>
 
-https://github.com/nwjs/nw.js/issues/1151
+<https://github.com/nwjs/nw.js/issues/1151>
 
-https://github.com/nwjs/nw.js/issues/7378
+<https://github.com/nwjs/nw.js/issues/7378>
 
 Cross compilation [tutorial][3] for v0.12.x
 
