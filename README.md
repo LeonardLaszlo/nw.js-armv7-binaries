@@ -2,6 +2,13 @@
 
 Hey, thanks for reading me. TLDR; The NW.js ARMv7 binaries are located under the [Releases][1] tab.
 
+## Contributing
+
+If you would like to support this project, the biggest contribution at the moment would be a self-hosted Github runner or a docker host on which the build will be executed. A virtual machine or access to a cloud ubuntu x64 instance would be nice as well. The building process is resource intensive, at least 10 GB of RAM,
+4GB of swap, 110 GB of disk, are needed, and of course, as many CPUs as possible.
+
+Another way to support this project is to join as a maintainer, and fix the building script when it fails.
+
 ## Instructions for running your NW.js application on Linux ARMv7
 
 After downloading the archive and unpacking it, the NW.js binary can be executed on Linux ARMv7 devices with the following command:
