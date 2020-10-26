@@ -102,6 +102,3 @@ export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 building_nw=1 buildtype=Official c
 build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\" is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
 mkdir -p ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
-
-# tar -zcvf v0.48.4.tar.gz dist/*
-# docker cp 957471aa9538:/usr/docker/v0.48.4.tar.gz binaries/
