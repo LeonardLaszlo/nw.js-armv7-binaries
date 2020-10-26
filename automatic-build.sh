@@ -33,8 +33,8 @@ while (( "$#" )); do
       COMMIT_IMAGE="true"
       shift
       ;;
-    --force-build)
-      FORCE_BUILD="true"
+    --docker-image-build-only)
+      DOCKER_IMAGE_BUILD_ONLY="true"
       shift
       ;;
     --upload-image)
@@ -125,27 +125,22 @@ function buildImage {
 }
 
 function prepareImage {
-  if [ -n "$FORCE_BUILD" ]; then
-    log "Force build was set. Building branch: $NWJS_BRANCH"
-    buildImage
+  log "Check whether the image exists on the docker host"
+  IMAGE_IDS=()
+  while IFS="" read -r line; do IMAGE_IDS+=("$line"); done < \
+    <(docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY")
+  if [ "${#IMAGE_IDS[@]}" -gt 0 ]; then
+    # IMAGE_ID is basically used for the following log only
+    # The actual image to be used will be either the one marked with the branch name as tag or the "latest" tag.
+    IMAGE_ID="${IMAGE_IDS[0]}"
+    log "Found image with id: $IMAGE_ID locally"
   else
-    log "Check whether the image exists on the docker host"
-    IMAGE_IDS=()
-    while IFS="" read -r line; do IMAGE_IDS+=("$line"); done < \
-      <(docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY")
-    if [ "${#IMAGE_IDS[@]}" -gt 0 ]; then
-      # IMAGE_ID is basically used for the following log only
-      # The actual image to be used will be either the one marked with the branch name as tag or the "latest" tag.
-      IMAGE_ID="${IMAGE_IDS[0]}"
-      log "Found image with id: $IMAGE_ID locally"
+    log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
+    if docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY"; then
+      log "Found image of $DOCKER_REPOSITORY on dockerhub"
     else
-      log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
-      if docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY"; then
-        log "Found image of $DOCKER_REPOSITORY on dockerhub"
-      else
-        log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
-        buildImage
-      fi
+      log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
+      buildImage
     fi
   fi
 }
@@ -227,6 +222,14 @@ function releaseOnGithub {
     "https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE")
   log "$UPLOAD_ARTIFACT_RESULT"
 }
+
+if [ -n "$DOCKER_IMAGE_BUILD_ONLY" ]; then
+  log "Only docker image build was chosen. Building image from branch: $NWJS_BRANCH"
+  buildImage
+  pushImageToDockerHubIfNeeded
+  log "Done building image from branch: $NWJS_BRANCH"
+  exit 0
+fi
 
 if [ -z "$CONTAINER_ID" ]; then
   prepareImage
