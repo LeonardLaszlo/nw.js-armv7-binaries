@@ -39,7 +39,7 @@ function getGitRepository {
 }
 
 function getNwjsRepository {
-  cd $NWJSDIR/src
+  cd $NWJSDIR
   gclient sync --reset --with_branch_heads --nohooks -D
   sh -c 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections'
   $NWJSDIR/src/build/install-build-deps.sh --arm --no-prompt --no-backwards-compatible
