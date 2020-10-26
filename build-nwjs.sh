@@ -35,9 +35,10 @@ function applyPatch {
 PATCH
 
   if [ "$NWJS_BRANCH" = "nw49" ]; then
+    echo "Apply patch for nw49"
     patch -p0 --ignore-whitespace << 'PATCH'
---- a/build/config/linux/atk/BUILD.gn
-+++ b/build/config/linux/atk/BUILD.gn
+--- build/config/linux/atk/BUILD.gn
++++ build/config/linux/atk/BUILD.gn
 @@ -10,7 +10,7 @@ import("//build/config/ui.gni")
  assert(!is_chromeos)
 
