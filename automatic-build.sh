@@ -25,27 +25,27 @@ PARAMS=""
 
 while (( "$#" )); do
   case "$1" in
-    -s|--silent)
+    --silent)
       SILENT="true"
       shift
       ;;
-    -i|--commit-image)
+    --commit-image)
       COMMIT_IMAGE="true"
       shift
       ;;
-    -f|--force-build)
+    --force-build)
       FORCE_BUILD="true"
       shift
       ;;
-    -u|--upload-image)
+    --upload-image)
       UPLOAD_IMAGE="true"
       shift
       ;;
-    -c|--clean-docker)
+    --clean-docker)
       CLEAN_DOCKER="true"
       shift
       ;;
-    -b|--branch)
+    --branch)
       if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         NWJS_BRANCH="$2"
         shift 2
@@ -53,7 +53,23 @@ while (( "$#" )); do
         error "Argument for $1 is missing"
       fi
       ;;
-    -h|--docker-host)
+    --github-token)
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+        GITHUB_TOKEN="$2"
+        shift 2
+      else
+        error "Argument for $1 is missing"
+      fi
+      ;;
+    --docker-container)
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+        CONTAINER_ID="$2"
+        shift 2
+      else
+        error "Argument for $1 is missing"
+      fi
+      ;;
+    --docker-host)
       if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         DOCKER_HOST="$2"
         shift 2
@@ -61,7 +77,7 @@ while (( "$#" )); do
         error "Argument for $1 is missing"
       fi
       ;;
-    -r|--docker-repository)
+    --docker-repository)
       if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         DOCKER_REPOSITORY="$2"
         shift 2
@@ -87,6 +103,10 @@ if [ -z "$NWJS_BRANCH" ]; then
   log "Get the active branch from the official repo"
   NWJS_BRANCH="$( curl --silent --no-buffer https://api.github.com/repos/nwjs/nw.js \
     | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
+fi
+
+if [ -z "$GITHUB_TOKEN" ]; then
+  GITHUB_TOKEN=$(cat .github-token)
 fi
 
 if [ -n "$DOCKER_HOST" ]; then
@@ -154,7 +174,7 @@ function buildImageAndStartContainer {
   startContainerFromImage
 }
 
-function startContainer {
+function createAndStartContainer {
   if [ -n "$FORCE_BUILD" ]; then
     log "Force build was set. Building branch: $NWJS_BRANCH"
     buildImageAndStartContainer
@@ -182,7 +202,7 @@ function startContainer {
   fi
 }
 
-function cleanDocker {
+function cleanDockerIfNeeded {
   if [ -n "$CLEAN_DOCKER" ]; then
     [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
     log "Clean the unused docker objects"
@@ -215,28 +235,30 @@ function stopContainer {
 function releaseOnGithub {
   FILE=$(basename -- "$1")
   FILE_NAME=${FILE%%.*}
-  ACCESS_TOKEN=$(cat .github-token)
-  if [ -n "$ACCESS_TOKEN" ]; then
-    RELEASE_JSON="{\"tag_name\": \"$FILE_NAME\",\"name\": \"$FILE_NAME\"}"
-    log "Create release $FILE_NAME"
-    CREATE_RELEASE_RESULT=$(curl -s -H "Authorization: token $ACCESS_TOKEN" --data "$RELEASE_JSON" \
-      $"https://api.github.com/repos/$GITHUB_REPO/releases")
-    log "$CREATE_RELEASE_RESULT"
-    RELEASE_ID="$( echo "$CREATE_RELEASE_RESULT" | python -c "import sys, json; print json.load(sys.stdin)['id']")"
-    log "Uploading artifact $FILE"
-    UPLOAD_ARTIFACT_RESULT=$(curl -s -H "Authorization: token $ACCESS_TOKEN" \
-      -H "Content-Type: $(file -b --mime-type binaries/"$FILE")" \
-      --data-binary @binaries/"$FILE" \
-      "https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE")
-    log "$UPLOAD_ARTIFACT_RESULT"
-  fi
+  RELEASE_JSON="{\"tag_name\": \"$FILE_NAME\",\"name\": \"$FILE_NAME\"}"
+  log "Create release $FILE_NAME"
+  CREATE_RELEASE_RESULT=$(curl -s -H "Authorization: token $GITHUB_TOKEN" --data "$RELEASE_JSON" \
+    $"https://api.github.com/repos/$GITHUB_REPO/releases")
+  log "$CREATE_RELEASE_RESULT"
+  RELEASE_ID="$( echo "$CREATE_RELEASE_RESULT" | python -c "import sys, json; print json.load(sys.stdin)['id']")"
+  log "Uploading artifact $FILE"
+  UPLOAD_ARTIFACT_RESULT=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+    -H "Content-Type: $(file -b --mime-type binaries/"$FILE")" \
+    --data-binary @binaries/"$FILE" \
+    "https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE")
+  log "$UPLOAD_ARTIFACT_RESULT"
 }
 
-startContainer
-cleanDocker
+if [ -z "$CONTAINER_ID" ]; then
+  createAndStartContainer
+else
+  log "Starting container $CONTAINER_ID"
+  docker "$DOCKER_PARAMS" start "$CONTAINER_ID"
+fi
+cleanDockerIfNeeded
 buildNwjs
 stopContainer
-if [ -n "$ARCHIVE_NAME" ]; then
+if [ -n "$ARCHIVE_NAME" ] && [ -n "$GITHUB_TOKEN" ]; then
   releaseOnGithub "$ARCHIVE_NAME"
 fi
-cleanDocker
+cleanDockerIfNeeded
