@@ -117,6 +117,58 @@ log "NW.js active branch: $NWJS_BRANCH"
 log "Docker repository: $DOCKER_REPOSITORY"
 log "Docker parameters: $DOCKER_PARAMS"
 
+function buildImage {
+  IMAGE_TAG="$DOCKER_REPOSITORY:$NWJS_BRANCH"
+  log "Start building $IMAGE_TAG"
+  docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$IMAGE_TAG" .
+  log "Building $IMAGE_TAG was successful"
+}
+
+function prepareImage {
+  if [ -n "$FORCE_BUILD" ]; then
+    log "Force build was set. Building branch: $NWJS_BRANCH"
+    buildImage
+  else
+    log "Check whether the image exists on the docker host"
+    IMAGE_IDS=()
+    while IFS="" read -r line; do IMAGE_IDS+=("$line"); done < \
+      <(docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY")
+    if [ "${#IMAGE_IDS[@]}" -gt 0 ]; then
+      # IMAGE_ID is basically used for the following log only
+      # The actual image to be used will be either the one marked with the branch name as tag or the "latest" tag.
+      IMAGE_ID="${IMAGE_IDS[0]}"
+      log "Found image with id: $IMAGE_ID locally"
+    else
+      log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
+      if docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY"; then
+        log "Found image of $DOCKER_REPOSITORY on dockerhub"
+      else
+        log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
+        buildImage
+      fi
+    fi
+  fi
+}
+
+function runContainer {
+  log "Start a container from the $DOCKER_REPOSITORY image"
+  CONTAINER_ID=$( \
+    docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY":"$NWJS_BRANCH" 2>/dev/null || \
+    docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY"\
+  )
+  log "Container created successfully. Id: $CONTAINER_ID"
+}
+
+function cleanDockerIfNeeded {
+  if [ -n "$CLEAN_DOCKER" ]; then
+    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+    log "Clean the unused docker objects"
+    docker "$DOCKER_PARAMS" stop "$(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")"
+    docker "$DOCKER_PARAMS" rm "$(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")"
+    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
+  fi
+}
+
 function commitImageIfNeeded {
   if [ -n "$UPLOAD_IMAGE" ] || [ -n "$COMMIT_IMAGE" ]; then
     log "Commit $CONTAINER_ID to $DOCKER_REPOSITORY:$NWJS_BRANCH"
@@ -130,61 +182,6 @@ function pushImageToDockerHubIfNeeded {
     log "Push $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
     docker "$DOCKER_PARAMS" push "$DOCKER_REPOSITORY:$NWJS_BRANCH"
     log "Pushed $DOCKER_REPOSITORY:$NWJS_BRANCH to docker hub"
-  fi
-}
-
-function startContainerFromImage {
-  log "Start a container from the $DOCKER_REPOSITORY image"
-  CONTAINER_ID=$( \
-    docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY":"$NWJS_BRANCH" 2>/dev/null || \
-    docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY"\
-  )
-  log "Container created successfully. Id: $CONTAINER_ID"
-}
-
-function buildImageAndStartContainer {
-  log "Start building $DOCKER_REPOSITORY image"
-  docker "$DOCKER_PARAMS" image build --build-arg NWJS_BRANCH="$NWJS_BRANCH" --tag "$DOCKER_REPOSITORY":"$NWJS_BRANCH" .
-  log "Building $DOCKER_REPOSITORY:$NWJS_BRANCH was successful"
-  pushImageToDockerHubIfNeeded
-  startContainerFromImage
-}
-
-function createAndStartContainer {
-  if [ -n "$FORCE_BUILD" ]; then
-    log "Force build was set. Building branch: $NWJS_BRANCH"
-    buildImageAndStartContainer
-  else
-    log "Check whether the image exists on the docker host"
-    IMAGE_IDS=()
-    while IFS="" read -r line; do IMAGE_IDS+=("$line"); done < \
-      <(docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY")
-    if [ "${#IMAGE_IDS[@]}" -gt 0 ]; then
-      # IMAGE_ID is basically used for the following log only
-      # The actual image to be used will be either the one marked with the branch name as tag or the "latest" tag.
-      IMAGE_ID="${IMAGE_IDS[0]}"
-      log "Found image with id: $IMAGE_ID locally"
-      startContainerFromImage
-    else
-      log "The $DOCKER_REPOSITORY image does not exist on the docker host. Pulling: $DOCKER_REPOSITORY";
-      if docker "$DOCKER_PARAMS" pull "$DOCKER_REPOSITORY"; then
-        log "Found image of $DOCKER_REPOSITORY on dockerhub"
-        startContainerFromImage
-      else
-        log "Didn't find image $DOCKER_REPOSITORY on dockerhub. Building active branch: $NWJS_BRANCH"
-        buildImageAndStartContainer
-      fi
-    fi
-  fi
-}
-
-function cleanDockerIfNeeded {
-  if [ -n "$CLEAN_DOCKER" ]; then
-    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
-    log "Clean the unused docker objects"
-    docker "$DOCKER_PARAMS" stop "$(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")"
-    docker "$DOCKER_PARAMS" rm "$(docker "$DOCKER_PARAMS" ps -aq --filter "ancestor=$DOCKER_REPOSITORY")"
-    [ -z "$SILENT" ] && docker "$DOCKER_PARAMS" system df
   fi
 }
 
@@ -232,7 +229,8 @@ function releaseOnGithub {
 }
 
 if [ -z "$CONTAINER_ID" ]; then
-  createAndStartContainer
+  prepareImage
+  runContainer
 else
   log "Starting container $CONTAINER_ID"
   docker "$DOCKER_PARAMS" start "$CONTAINER_ID"
