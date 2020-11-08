@@ -147,10 +147,7 @@ function prepareImage {
 
 function runContainer {
   log "Start a container from the $DOCKER_REPOSITORY image"
-  CONTAINER_ID=$( \
-    docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY":"$NWJS_BRANCH" 2>/dev/null || \
-    docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY"\
-  )
+  CONTAINER_ID=$(docker "$DOCKER_PARAMS" run --detach --tty "$DOCKER_REPOSITORY")
   log "Container created successfully. Id: $CONTAINER_ID"
 }
 
