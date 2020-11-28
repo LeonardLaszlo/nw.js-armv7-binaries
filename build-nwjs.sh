@@ -34,8 +34,6 @@ function applyPatch {
    source_is_generated = true
 PATCH
 
-  if [ "$NWJS_BRANCH" = "nw49" ]; then
-    echo "Apply patch for nw49"
     patch -p0 --ignore-whitespace << 'PATCH'
 --- build/config/linux/atk/BUILD.gn
 +++ build/config/linux/atk/BUILD.gn
@@ -49,7 +47,6 @@ PATCH
  if (use_atk) {
    assert(use_glib, "use_atk=true requires that use_glib=true")
 PATCH
-fi
 }
 
 function build {
