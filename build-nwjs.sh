@@ -19,10 +19,10 @@ function applyPatch {
   patch -p0 --ignore-whitespace << 'PATCH'
 --- chrome/browser/BUILD.gn
 +++ chrome/browser/BUILD.gn
-@@ -5238,11 +5238,7 @@ proto_library("resource_prefetch_predictor_proto") {
- }
+@@ -6356,11 +6356,7 @@ grit("resources") {
+   # TODO(crbug.com / 1112471): Get this to run cleanly under Python 3.
+   run_under_python2 = true
 
- grit("resources") {
 -  if (nwjs_sdk) {
 -    source = "browser_resources.grd"
 -  } else {
@@ -30,8 +30,8 @@ function applyPatch {
 -  }
 +  source = "browser_resources.grd"
 
-   # The .grd contains references to generated files.
-   source_is_generated = true
+   # Required due to flattenhtml = "true" on a generated file.
+   enable_input_discovery_for_gn_analyze = false
 PATCH
 
     patch -p0 --ignore-whitespace << 'PATCH'
