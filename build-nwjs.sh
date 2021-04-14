@@ -80,7 +80,7 @@ PATCH
 
 function build {
   cd $NWJSDIR/src
-  gn gen out/nw --args="${1}"
+  gn gen out/nw --args="${1} enable_widevine=false is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
   $NWJSDIR/src/build/gyp_chromium -I third_party/node-nw/common.gypi third_party/node-nw/node.gyp
   ninja -C out/nw nwjs
   ninja -C out/Release node
@@ -109,22 +109,24 @@ applyPatch
 
 if [ -d "${WORKDIR}/dist" ]; then rm -r ${WORKDIR}/dist; fi
 
-export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
-build "nwjs_sdk=false enable_nacl=false is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
+COMMON_GYP_DEFINES="enable_widevine=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
+
+export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
+build "nwjs_sdk=false enable_nacl=false"
 mkdir -p ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
 
-export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
-build "nwjs_sdk=false enable_nacl=false ffmpeg_branding=\"Chrome\" is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
+export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
+build "nwjs_sdk=false enable_nacl=false ffmpeg_branding=\"Chrome\""
 mkdir -p ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
 
-export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
-build "nwjs_sdk=true enable_nacl=true is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
+export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 $COMMON_GYP_DEFINES"
+build "nwjs_sdk=true enable_nacl=true"
 mkdir -p ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
 
-export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
-build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\" is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
+export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 $COMMON_GYP_DEFINES"
+build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\""
 mkdir -p ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
 cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
