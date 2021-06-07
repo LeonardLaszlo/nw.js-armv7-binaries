@@ -19,10 +19,10 @@ function applyPatch {
   patch -p0 --ignore-whitespace << 'PATCH'
 --- chrome/browser/BUILD.gn
 +++ chrome/browser/BUILD.gn
-@@ -6356,11 +6356,7 @@ grit("resources") {
-   # TODO(crbug.com / 1112471): Get this to run cleanly under Python 3.
-   run_under_python2 = true
+@@ -6499,11 +6499,7 @@ proto_library("permissions_proto") {
+ }
 
+ grit("resources") {
 -  if (nwjs_sdk) {
 -    source = "browser_resources.grd"
 -  } else {
@@ -49,32 +49,17 @@ PATCH
 PATCH
 
     patch -p0 --ignore-whitespace << 'PATCH'
---- content/nw/src/api/nw_app_api.cc
-+++ content/nw/src/api/nw_app_api.cc
-@@ -1,5 +1,8 @@
- #include "content/nw/src/api/nw_app_api.h"
+--- build/config/linux/atspi2/BUILD.gn
++++ build/config/linux/atspi2/BUILD.gn
+@@ -6,7 +6,7 @@ import("//build/config/linux/pkg_config.gni")
+ import("//build/config/ui.gni")
 
-+#include "build/build_config.h"
-+#include "third_party/widevine/cdm/buildflags.h"
-+
- #include "chrome/browser/lifetime/browser_close_manager.h"
- #include "chrome/browser/lifetime/application_lifetime.h"
- #include "content/public/common/content_features.h"
-@@ -104,10 +107,14 @@ NwAppCloseAllWindowsFunction::Run() {
+ # These packages should _only_ be expected when building for a target.
+-assert(current_toolchain == default_toolchain)
++# assert(current_toolchain == default_toolchain)
 
- ExtensionFunction::ResponseAction
- NwAppEnableComponentFunction::Run() {
-+#if BUILDFLAG(ENABLE_WIDEVINE)
-   component_updater::RegisterWidevineCdmComponent(g_browser_process->component_updater(),
-                                                   base::BindOnce(&NwAppEnableComponentFunction::OnRegistered,
-                                                                  this));
-   return RespondLater();
-+#else
-+  return RespondNow(NoArguments());
-+#endif
- }
-
- void NwAppEnableComponentFunction::OnRegistered() {
+ if (use_atk) {
+   pkg_config("atspi2") {
 PATCH
 }
 
