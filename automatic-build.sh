@@ -198,6 +198,27 @@ function buildNwjs {
   log "Artifact $ARCHIVE_NAME copied successfully"
 }
 
+function buildNwjsArm64 {
+  log "Updating branch"
+  docker "$DOCKER_PARAMS" cp checkout-branch.sh "$CONTAINER_ID":/usr/docker
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/checkout-branch.sh "$NWJS_BRANCH"
+  log "Finished updating branch"
+  commitImageIfNeeded
+  pushImageToDockerHubIfNeeded
+  log "Start building $NWJS_BRANCH"
+  docker "$DOCKER_PARAMS" cp build-nwjs-arm64.sh "$CONTAINER_ID":/usr/docker
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs-arm64.sh "$NWJS_BRANCH"
+  log "Building $NWJS_BRANCH was successful"
+  ARCHIVE_NAME=${NWJS_BRANCH}-arm64_$(date +"%Y-%m-%d").tar.gz
+  log "Create $ARCHIVE_NAME archive"
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
+    sh -c "tar --force-local -zcvf ${ARCHIVE_NAME} /usr/docker/dist/*"
+  mkdir -p binaries
+  log "Copy artifact $ARCHIVE_NAME from container to host"
+  docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
+  log "Artifact $ARCHIVE_NAME copied successfully"
+}
+
 function stopContainer {
   log "Stop container $CONTAINER_ID"
   docker "$DOCKER_PARAMS" stop "$CONTAINER_ID"
@@ -237,6 +258,7 @@ else
 fi
 cleanDockerIfNeeded
 buildNwjs
+buildNwjsArm64
 stopContainer
 if [ -n "$ARCHIVE_NAME" ] && [ -n "$GITHUB_TOKEN" ]; then
   releaseOnGithub "$ARCHIVE_NAME"
