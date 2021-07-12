@@ -1,0 +1,15 @@
+--- src/chrome/browser/BUILD.gn
++++ src/chrome/browser/BUILD.gn
+@@ -6356,11 +6356,7 @@ grit("resources") {
+   # TODO(crbug.com / 1112471): Get this to run cleanly under Python 3.
+   run_under_python2 = true
+
+-  if (nwjs_sdk) {
+-    source = "browser_resources.grd"
+-  } else {
+-    source = "nwjs_resources.grd"
+-  }
++  source = "browser_resources.grd"
+
+   # Required due to flattenhtml = "true" on a generated file.
+   enable_input_discovery_for_gn_analyze = false
