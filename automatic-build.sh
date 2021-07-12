@@ -178,7 +178,21 @@ function pushImageToDockerHubIfNeeded {
 }
 
 function buildNwjs {
-  log "Updating branch"
+  ARCH="$1"
+  case "$ARCH" in
+    arm32)
+      ARCHIVE_NAME=${NWJS_BRANCH}_$(date +"%Y-%m-%d").tar.gz
+      ;;
+    arm64)
+      ARCHIVE_NAME=${NWJS_BRANCH}-arm64_$(date +"%Y-%m-%d").tar.gz
+      ;;
+    *)
+      error "Unsupported arch: $ARCH"
+      exit 1;
+      ;;
+  esac
+  log "Start building $ARCHIVE_NAME"
+  log "Updating branch $NWJS_BRANCH"
   docker "$DOCKER_PARAMS" cp checkout-branch.sh "$CONTAINER_ID":/usr/docker
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/checkout-branch.sh "$NWJS_BRANCH"
   log "Finished updating branch"
@@ -186,9 +200,8 @@ function buildNwjs {
   pushImageToDockerHubIfNeeded
   log "Start building $NWJS_BRANCH"
   docker "$DOCKER_PARAMS" cp build-nwjs.sh "$CONTAINER_ID":/usr/docker
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh "$NWJS_BRANCH"
+  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs.sh "$NWJS_BRANCH" "$ARCH"
   log "Building $NWJS_BRANCH was successful"
-  ARCHIVE_NAME=${NWJS_BRANCH}_$(date +"%Y-%m-%d").tar.gz
   log "Create $ARCHIVE_NAME archive"
   docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
     sh -c "tar --force-local -zcvf ${ARCHIVE_NAME} /usr/docker/dist/*"
@@ -196,27 +209,9 @@ function buildNwjs {
   log "Copy artifact $ARCHIVE_NAME from container to host"
   docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
   log "Artifact $ARCHIVE_NAME copied successfully"
-}
-
-function buildNwjsArm64 {
-  log "Updating branch"
-  docker "$DOCKER_PARAMS" cp checkout-branch.sh "$CONTAINER_ID":/usr/docker
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/checkout-branch.sh "$NWJS_BRANCH"
-  log "Finished updating branch"
-  commitImageIfNeeded
-  pushImageToDockerHubIfNeeded
-  log "Start building $NWJS_BRANCH"
-  docker "$DOCKER_PARAMS" cp build-nwjs-arm64.sh "$CONTAINER_ID":/usr/docker
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" /usr/docker/build-nwjs-arm64.sh "$NWJS_BRANCH"
-  log "Building $NWJS_BRANCH was successful"
-  ARCHIVE_NAME=${NWJS_BRANCH}-arm64_$(date +"%Y-%m-%d").tar.gz
-  log "Create $ARCHIVE_NAME archive"
-  docker "$DOCKER_PARAMS" exec --interactive --tty "$CONTAINER_ID" \
-    sh -c "tar --force-local -zcvf ${ARCHIVE_NAME} /usr/docker/dist/*"
-  mkdir -p binaries
-  log "Copy artifact $ARCHIVE_NAME from container to host"
-  docker "$DOCKER_PARAMS" cp "$CONTAINER_ID":/usr/docker/"$ARCHIVE_NAME" ./binaries/
-  log "Artifact $ARCHIVE_NAME copied successfully"
+  if [ -n "$ARCHIVE_NAME" ] && [ -n "$GITHUB_TOKEN" ]; then
+    releaseOnGithub "$ARCHIVE_NAME"
+  fi
 }
 
 function stopContainer {
@@ -257,10 +252,7 @@ else
   docker "$DOCKER_PARAMS" start "$CONTAINER_ID"
 fi
 cleanDockerIfNeeded
-buildNwjs
-buildNwjsArm64
+buildNwjs arm32
+buildNwjs arm64
 stopContainer
-if [ -n "$ARCHIVE_NAME" ] && [ -n "$GITHUB_TOKEN" ]; then
-  releaseOnGithub "$ARCHIVE_NAME"
-fi
 cleanDockerIfNeeded

@@ -1,17 +1,27 @@
 # NW.js ARMv7 binaries
 
-Hey, thanks for reading me. TLDR; The NW.js ARMv7 binaries are located under the [Releases][1] tab.
+The NW.js ARMv7 and ARMv8 (experimental) binaries are located under the [Releases][1] tab.
+
+## Experimental 64 bit binaries are now available
+
+64 bit and 32 bit binaries are packaged and released separately. The 64 bit package does not contain the SDK versions.
 
 ## Contributing
 
-If you would like to support this project, the biggest contribution at the moment would be a self-hosted Github runner or a docker host on which the build will be executed. A virtual machine or access to a cloud ubuntu x64 instance would be nice as well. The building process is resource intensive, at least 10 GB of RAM,
-4GB of swap, 110 GB of disk, are needed, and of course, as many CPUs as possible.
+The most needed contribution at the moment is a self-hosted Github runner or a docker host for the build execution.
+A virtual machine or access to a cloud ubuntu x64 instance could be useful as well.
 
-Another way to support this project is to join as a maintainer, and fix the building script when it fails.
+The building process is resource intensive, the minimal requirements are:
+- 10 GB of RAM,
+- 4GB of swap,
+- 110 GB of disk,
+- and of course, as many CPU cores as possible.
+
+Another way to support this project is to join as a maintainer, and patch the building script once in a while.
 
 ## Instructions for running your NW.js application on Linux ARMv7
 
-After downloading the archive and unpacking it, the NW.js binary can be executed on Linux ARMv7 devices with the following command:
+After downloading the archive and unpacking it, the NW.js binary can be executed on Linux ARMv7 devices with:
 
 `./nw --use-gl=egl --ignore-gpu-blacklist --disable-accelerated-2d-canvas --num-raster-threads=2`
 
@@ -19,13 +29,14 @@ Thanks **@gripped**, **@jtg-gg** and **@llamasoft** for their endless patience a
 
 ## Docker
 
-Thanks to Docker containerization, building NW.js for ARMv7 is now as easy as it gets.
-However the building process is resource intensive, so I suggest at least 10 GB of RAM,
-4GB of swap, 110 GB of disk, and ofc, as many CPUs as possible.
+Thanks to Docker containerisation, building NW.js for ARMv7 is now as easy as it gets.
+However the building process is resource intensive, so brace yourselves. See:
 
 ``` Bash
 ./automatic-build.sh
 ```
+
+for a starting point.
 
 ## Further reading
 

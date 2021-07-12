@@ -3,6 +3,7 @@
 set -e
 
 export NWJS_BRANCH="$1"
+export ARCH="$2"
 export WORKDIR="/usr/docker"
 export NWJSDIR=${WORKDIR}/nwjs
 export DEPOT_TOOLS_DIRECTORY=${WORKDIR}/depot_tools
@@ -34,7 +35,7 @@ function applyPatch {
    enable_input_discovery_for_gn_analyze = false
 PATCH
 
-    patch -p0 --ignore-whitespace << 'PATCH'
+  patch -p0 --ignore-whitespace << 'PATCH'
 --- build/config/linux/atk/BUILD.gn
 +++ build/config/linux/atk/BUILD.gn
 @@ -10,7 +10,7 @@ import("//build/config/ui.gni")
@@ -48,7 +49,7 @@ PATCH
    assert(use_glib, "use_atk=true requires that use_glib=true")
 PATCH
 
-    patch -p0 --ignore-whitespace << 'PATCH'
+  patch -p0 --ignore-whitespace << 'PATCH'
 --- build/config/linux/atspi2/BUILD.gn
 +++ build/config/linux/atspi2/BUILD.gn
 @@ -6,7 +6,7 @@ import("//build/config/linux/pkg_config.gni")
@@ -61,11 +62,39 @@ PATCH
  if (use_atk) {
    pkg_config("atspi2") {
 PATCH
+
+  if [ "arm64" = "$ARCH" ]; then
+    patch -p0 --ignore-whitespace << 'PATCH'
+--- third_party/node-nw/common.gypi
++++ third_party/node-nw/common.gypi
+@@ -132,6 +132,9 @@
+       ['OS=="linux" and target_arch=="arm" and <(building_nw)==1', {
+         'sysroot': '<!(cd <(DEPTH) && pwd -P)/build/linux/debian_sid_arm-sysroot',
+       }],
++      ['OS=="linux" and target_arch=="arm64" and <(building_nw)==1', {
++        'sysroot': '<!(cd <(DEPTH) && pwd -P)/build/linux/debian_sid_arm64-sysroot',
++      }],
+       ['openssl_fips != ""', {
+         'openssl_product': '<(STATIC_LIB_PREFIX)crypto<(STATIC_LIB_SUFFIX)',
+       }, {
+@@ -584,6 +587,10 @@
+             'cflags': [ '--target=arm-linux-gnueabihf' ],
+             'ldflags': [ '--target=arm-linux-gnueabihf' ],
+           }],
++          [ 'OS=="linux" and target_arch=="arm64"', {
++            'cflags': [ '--target=aarch64-linux-gnu' ],
++            'ldflags': [ '--target=aarch64-linux-gnu' ],
++          }],
+           [ 'target_arch=="ppc" and OS!="aix"', {
+             'cflags': [ '-m32' ],
+             'ldflags': [ '-m32' ],
+PATCH
+  fi
 }
 
 function build {
   cd $NWJSDIR/src
-  gn gen out/nw --args="${1} enable_widevine=false is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\" target_cpu=\"arm\" arm_float_abi=\"hard\""
+  gn gen out/nw --args="${1} enable_widevine=false is_component_ffmpeg=true is_debug=false symbol_level=1 target_os=\"linux\""
   $NWJSDIR/src/build/gyp_chromium -I third_party/node-nw/common.gypi third_party/node-nw/node.gyp
   ninja -C out/nw nwjs
   ninja -C out/Release node
@@ -94,24 +123,40 @@ applyPatch
 
 if [ -d "${WORKDIR}/dist" ]; then rm -r ${WORKDIR}/dist; fi
 
-COMMON_GYP_DEFINES="enable_widevine=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
+if [ "arm32" = "$ARCH" ]; then
+  COMMON_GYP_DEFINES="enable_widevine=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm target_cpu=arm arm_float_abi=hard"
 
-export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
-build "nwjs_sdk=false enable_nacl=false"
-mkdir -p ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
-cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
+  export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
+  build "nwjs_sdk=false enable_nacl=false target_cpu=\"arm\" arm_float_abi=\"hard\""
+  mkdir -p ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
+  cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
 
-export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
-build "nwjs_sdk=false enable_nacl=false ffmpeg_branding=\"Chrome\""
-mkdir -p ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
-cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
+  export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
+  build "nwjs_sdk=false enable_nacl=false ffmpeg_branding=\"Chrome\" target_cpu=\"arm\" arm_float_abi=\"hard\""
+  mkdir -p ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
+  cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
 
-export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 $COMMON_GYP_DEFINES"
-build "nwjs_sdk=true enable_nacl=true"
-mkdir -p ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
-cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
+  export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 $COMMON_GYP_DEFINES"
+  build "nwjs_sdk=true enable_nacl=true target_cpu=\"arm\" arm_float_abi=\"hard\""
+  mkdir -p ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
+  cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chromium-ffmpeg-branding
 
-export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 $COMMON_GYP_DEFINES"
-build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\""
-mkdir -p ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
-cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
+  export GYP_DEFINES="nwjs_sdk=1 disable_nacl=0 $COMMON_GYP_DEFINES"
+  build "nwjs_sdk=true enable_nacl=true ffmpeg_branding=\"Chrome\" target_cpu=\"arm\" arm_float_abi=\"hard\""
+  mkdir -p ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
+  cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-sdk-chrome-ffmpeg-branding
+fi
+
+if [ "arm64" = "$ARCH" ]; then
+  COMMON_GYP_DEFINES="enable_widevine=0 building_nw=1 buildtype=Official clang=1 OS=linux target_arch=arm64"
+
+  export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
+  build "nwjs_sdk=false enable_nacl=false target_cpu=\"arm64\""
+  mkdir -p ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
+  cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chromium-ffmpeg-branding
+
+  export GYP_DEFINES="nwjs_sdk=0 disable_nacl=1 $COMMON_GYP_DEFINES"
+  build "nwjs_sdk=false enable_nacl=false ffmpeg_branding=\"Chrome\" target_cpu=\"arm64\""
+  mkdir -p ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
+  cp ${NWJSDIR}/src/out/nw/dist/** ${WORKDIR}/dist/nwjs-chrome-ffmpeg-branding
+fi
