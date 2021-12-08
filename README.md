@@ -6,37 +6,35 @@ The NW.js ARMv7 and ARMv8 (experimental) binaries are located under the [Release
 
 64 bit and 32 bit binaries are packaged and released separately. The 64 bit package does not contain the SDK versions.
 
-## Contributing
-
-The most needed contribution at the moment is a self-hosted Github runner or a docker host for the build execution.
-A virtual machine or access to a cloud ubuntu x64 instance could be useful as well.
-
-The building process is resource intensive, the minimal requirements are:
-- 10 GB of RAM,
-- 4GB of swap,
-- 110 GB of disk,
-- and of course, as many CPU cores as possible.
-
-Another way to support this project is to join as a maintainer, and patch the building script once in a while.
-
 ## Instructions for running your NW.js application on Linux ARMv7
 
 After downloading the archive and unpacking it, the NW.js binary can be executed on Linux ARMv7 devices with:
 
 `./nw --use-gl=egl --ignore-gpu-blacklist --disable-accelerated-2d-canvas --num-raster-threads=2`
 
-Thanks **@gripped**, **@jtg-gg** and **@llamasoft** for their endless patience and continuous help!
+Thanks **@gripped**, **@jtg-gg** and **@llamasoft** for their endless patience and help!
 
-## Docker
+## Building the binaries
 
-Thanks to Docker containerisation, building NW.js for ARMv7 is now as easy as it gets.
-However the building process is resource intensive, so brace yourselves. See:
+Starting the build of nw57 branch:
 
 ``` Bash
-./automatic-build.sh
+./automatic-build.sh --branch nw57
 ```
 
-for a starting point.
+If no branch is provided the script will use the latest version for the build.
+
+Starting the build of nw57 branch in an existing docker container:
+
+``` Bash
+./automatic-build.sh --branch nw57 --docker-container 45c1550a0bb3
+```
+
+Building the build environment docker image and upload it to docker hub:
+
+``` Bash
+./automatic-build.sh --branch nw57 --docker-image-build-only --upload-image
+```
 
 ## Further reading
 

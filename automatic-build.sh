@@ -105,6 +105,9 @@ if [ -z "$NWJS_BRANCH" ]; then
     | python -c 'import sys, json; print(json.load(sys.stdin)["default_branch"])' )"
 fi
 
+# The Github token is needed for the release on Github.
+# It can be provided manually or in a text file name .github-token, under the root of this repository.
+# If not provided the script will skip uploading to Github.
 if [ -z "$GITHUB_TOKEN" ]; then
   GITHUB_TOKEN=$(cat .github-token)
 fi
@@ -117,6 +120,9 @@ log "NW.js active branch: $NWJS_BRANCH"
 log "Docker repository: $DOCKER_REPOSITORY"
 log "Docker parameters: $DOCKER_PARAMS"
 
+# This build script uses the latest build environment image from dockerhub.
+# This function is used to build the build environment image for dockerhub
+# or as a fallback when the image is not available.
 function buildImage {
   IMAGE_TAG="$DOCKER_REPOSITORY:$NWJS_BRANCH"
   log "Start building $IMAGE_TAG"
@@ -127,6 +133,7 @@ function buildImage {
 function prepareImage {
   log "Check whether the image exists on the docker host"
   IMAGE_IDS=()
+  # Read the docker images to the IMAGE_IDS array.
   while IFS="" read -r line; do IMAGE_IDS+=("$line"); done < \
     <(docker "$DOCKER_PARAMS" images --all --quiet "$DOCKER_REPOSITORY")
   if [ "${#IMAGE_IDS[@]}" -gt 0 ]; then
