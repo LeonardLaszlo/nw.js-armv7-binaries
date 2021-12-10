@@ -74,9 +74,9 @@ PATCH
 +      ['OS=="linux" and target_arch=="arm64" and <(building_nw)==1', {
 +        'sysroot': '<!(cd <(DEPTH) && pwd -P)/build/linux/debian_sid_arm64-sysroot',
 +      }],
-       ['openssl_fips != ""', {
-         'openssl_product': '<(STATIC_LIB_PREFIX)crypto<(STATIC_LIB_SUFFIX)',
-       }, {
+       ['OS=="mac"', {
+         'clang%': 1,
+         'obj_dir%': '<(PRODUCT_DIR)/obj.target',
 @@ -584,6 +587,10 @@
              'cflags': [ '--target=arm-linux-gnueabihf' ],
              'ldflags': [ '--target=arm-linux-gnueabihf' ],
