@@ -84,7 +84,7 @@ Generally if you are not interested in running Chromium tests, you don't have to
 
 **Step 2.** Manually clone and checkout correct branches for following repositories:
 
-| path | repo |
+| path |repository|
 |:---- |:---- |
 | src/content/nw | <https://github.com/nwjs/nw.js> |
 | src/third_party/node | <https://github.com/nwjs/node> |

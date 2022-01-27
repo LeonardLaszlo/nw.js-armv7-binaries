@@ -84,7 +84,7 @@ Generally if you are not interested in running Chromium tests, you don't have to
 
 **Step 2.** Manually clone and checkout correct branches for following repositories:
 
-| path | repo |
+| path |repository|
 |:---- |:---- |
 | src/content/nw | <https://github.com/nwjs/nw.js> |
 | src/third_party/node | <https://github.com/nwjs/node> |
@@ -127,7 +127,7 @@ This usually downloads 20G+ from remote repositories.
 
 **Step 5.** Get some ARMv7 specific patches:
 ```bash
-# [Build] add node build tools for linux arm
+# [Build] addNode.jsbuild tools for linux arm
 curl -s https://github.com/jtg-gg/chromium.src/commit/bc8e7a6314c9d43ce75669ad26016193aaa8106c.patch | git am
 
 # [Build][gn] add support for linux arm binary strip
