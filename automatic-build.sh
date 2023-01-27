@@ -195,7 +195,6 @@ function buildNwjs {
       ;;
     *)
       error "Unsupported arch: $ARCH"
-      exit 1;
       ;;
   esac
   log "Start building $ARCHIVE_NAME"
