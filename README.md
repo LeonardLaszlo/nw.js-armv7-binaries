@@ -1,5 +1,7 @@
 # NW.js ARMv7 binaries
 
+[![Super-Linter](https://github.com/LeonardLaszlo/nw.js-armv7-binaries/actions/workflows/superlinter.yml/badge.svg)](https://github.com/LeonardLaszlo/nw.js-armv7-binaries/actions/workflows/superlinter.yml)
+
 The NW.js ARMv7 and ARMv8 (experimental) binaries are located under the [Releases][1] tab.
 
 ## Experimental 64 bit binaries are now available
