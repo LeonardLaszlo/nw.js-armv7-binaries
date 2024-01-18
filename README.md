@@ -12,7 +12,7 @@ The NW.js ARMv7 and ARMv8 (experimental) binaries are located under the [Release
 
 After downloading the archive and unpacking it, the NW.js binary can be executed on Linux ARMv7 devices with:
 
-`./nw --use-gl=egl --ignore-gpu-blacklist --disable-accelerated-2d-canvas --num-raster-threads=2`
+`./nw --use-gl=egl --ignore-gpu-blocklist --disable-accelerated-2d-canvas --num-raster-threads=2`
 
 Thanks **@gripped**, **@jtg-gg** and **@llamasoft** for their endless patience and help!
 
