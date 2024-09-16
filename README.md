@@ -1,4 +1,4 @@
-# NW.js ARMv7 binaries
+# NW.js ARMv7 binaries (discontinued)
 
 [![Super-Linter](https://github.com/LeonardLaszlo/nw.js-armv7-binaries/actions/workflows/superlinter.yml/badge.svg)](https://github.com/LeonardLaszlo/nw.js-armv7-binaries/actions/workflows/superlinter.yml)
 
