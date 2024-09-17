@@ -1,0 +1,23 @@
+--- src/third_party/node-nw/common.gypi
++++ src/third_party/node-nw/common.gypi
+@@ -132,6 +132,9 @@
+       ['OS=="linux" and target_arch=="arm" and <(building_nw)==1', {
+         'sysroot': '<!(cd <(DEPTH) && pwd -P)/build/linux/debian_sid_arm-sysroot',
+       }],
++      ['OS=="linux" and target_arch=="arm64" and <(building_nw)==1', {
++        'sysroot': '<!(cd <(DEPTH) && pwd -P)/build/linux/debian_sid_arm64-sysroot',
++      }],
+       ['openssl_fips != ""', {
+         'openssl_product': '<(STATIC_LIB_PREFIX)crypto<(STATIC_LIB_SUFFIX)',
+       }, {
+@@ -584,6 +587,10 @@
+             'cflags': [ '--target=arm-linux-gnueabihf' ],
+             'ldflags': [ '--target=arm-linux-gnueabihf' ],
+           }],
++          [ 'OS=="linux" and target_arch=="arm64"', {
++            'cflags': [ '--target=aarch64-linux-gnu' ],
++            'ldflags': [ '--target=aarch64-linux-gnu' ],
++          }],
+           [ 'target_arch=="ppc" and OS!="aix"', {
+             'cflags': [ '-m32' ],
+             'ldflags': [ '-m32' ],
